@@ -1,0 +1,233 @@
+\documentclass[a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[english]{babel}
+\usepackage{url}
+\usepackage{amsmath}
+
+\newcommand{\rodeo}{\texttt{rodeo}}
+\newcommand{\rodeoApp}{\texttt{rodeoApp}}
+\title{Practical introduction to the \rodeo{} package}
+\author{david.kneis@tu-dresden.de}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Why would you use the \rodeo{} package?} \label{sec:why}
+
+The \rodeo{} package can facilitate development and use of ODE-based simulation models. The basic idea is to store the ODE system (forming the model's core) in plain text files or spreadsheets. This is in contrast to the usual way where the model equations are directly implemented in a computer code.
+
+The advantages are as follows:
+\begin{itemize}
+ \item The model is formulated independently of a particular computer language. Translators could be written for any target language or modeling package. This is a key to making the model re-usable.
+ \item Model equations and the related documentation really form a unit.
+ \item It becomes possible to visualize the structure of a model. In addition, it may be possible to automatically validate a model (not yet done).
+ \item The \rodeo{} package currently supports code generation for the target languages listed in Sec.~\ref{sec:targetLanguages}. Use of a compiled language like Fortran is indispensible for building high-performance code.
+ \item The \rodeo{} package can generate code for both zero-dimensional models (where all state variables are scalars) and spatially distributed models (e.~g. reactive transport models).
+ \item Is is possible to automatically generate user interfaces from the text/table-based model description.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Target languages of \rodeo} \label{sec:targetLanguages}
+The currently supported target languages are:
+
+\begin{description}
+ \item [R] Suitable for models with few state variables and short periods of integration.
+ \item [Fortran 95] For demanding models and all cases where computation times need to be reduced to a minimum.
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{How to obtain package and documentation} \label{sec:obtain}
+
+The package's repository is \url{https://github.com/dkneis/rodeo}. At present, there is no CRAN version. To install and load the package, one can use, for example:
+
+\begin{verbatim}
+# Package allowing direct install of other packages from github
+if (!("devtools" %in% installed.packages()[,1]))
+  install.packages("devtools")
+library("devtools")
+
+# Now install and load rodeo
+if (!("rodeo" %in% installed.packages()[,1]))
+  install_github("dkneis/rodeo")
+library("rodeo")
+\end{verbatim}
+
+If the package needs to be re-installed after an update, one should use
+
+\begin{verbatim}
+remove.packages("rodeo")
+\end{verbatim}
+
+prior to the installation commands above.
+
+The primary documentation for \rodeo{} is the packages' vignette. It can be accessed as follows:
+
+\begin{verbatim}
+library(rodeo)
+vignette("rodeo")
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{\rodeo{}'s input} \label{sec:input}
+
+\subsection{Conventions} \label{sec:input:conventions}
+
+\subsubsection{Matrix notation} \label{sec:input:conventions:matrix}
+\rodeo{} expects the ODE system to be written in vector/matrix notatation (see \url{http://en.wikipedia.org/wiki/Petersen_matrix}). This can be illustrated on a two-equations example with state variables $Z$, $X$ and parameters $k_d$, $k_a$, $X_{sat}$. Using vector/matrix notation, the original differential eqations 
+
+\begin{align}
+  \dfrac{d}{dt} Z &= -k_d \cdot Z \nonumber \\
+  \dfrac{d}{dt} X &= -k_d \cdot Z \cdot s + k_a \cdot (X_{sat} - X) \nonumber 
+\end{align}
+
+can be written as
+
+\bigskip
+\begin{minipage}[b]{0.25\textwidth}
+  Vector of derivatives
+  \begin{equation*}
+  \begin{bmatrix} \frac{d}{dt}Z \\ \frac{d}{dt}X \end{bmatrix}
+  \end{equation*}
+\end{minipage}
+\begin{minipage}[b]{0.1\textwidth}
+ =
+\end{minipage}
+\begin{minipage}[b]{0.25\textwidth}
+Transposed stoichiometry matrix
+\begin{equation*}
+\begin{bmatrix} -1 & 0 \\ -s & 1 \end{bmatrix}
+\end{equation*}
+\end{minipage}
+\begin{minipage}[b]{0.1\textwidth}
+ $\cdot$
+\end{minipage}
+\begin{minipage}[b]{0.25\textwidth}
+Process rates
+\begin{equation*}
+\begin{bmatrix} k_d \cdot Z \\ k_a \cdot (X_{sat} - X) \end{bmatrix}
+\end{equation*}
+\end{minipage}
+
+\bigskip
+By convention, the stoichiometry matrix has the names of the state variables as column headers and the names of the processes as row headers. Therefore, depending on the context, the matrix needs to be transposed (as in the example above).
+
+\subsubsection{Names of identifiers} \label{sec:input:conventions:names}
+Any user-defined names of state variables, parameters, and functions must also be valid identifiers in R and Fortran. Thus, names must start with a letter, optionally followed by additional letter(s), number(s), or underscore(s). They must not be reserved words in the mentioned langauges (like, e.~g. 'for' or 'end'). A list of Fortran's reserverd words can be found, for example, at \url{http://fortranwiki.org/fortran/show/Keywords}.
+
+Note that names should be regarded as case-insensitive (as in Fortran and in contrast to R). Hence, one cannot declare, e.~g., two parameters 'k' and 'K'.
+
+\subsubsection{Mathematical operators} \label{sec:input:conventions:operators}
+The four basic operators are guaranteed to be compatible with \rodeo{} (since they are compatible with both R and Fortran). For power operations, the double asterisk (\verb!**!) must be used instead of the acute (\verb!^!).
+
+Note: Language-specific operators can always be used within functions implemented in the respective target language. The same applies to functions which are not intrisic to all possible target languages (currently R and Fortran).
+
+\subsection{Required tables} \label{sec:input:tables}
+
+To build a model with \rodeo{}, the user needs to fill in several tables. There are two options how to practically do this:
+\begin{enumerate}
+ \item Write plain ASCII text file with columns being separated by a designated character (recommended is either semi-colon or TAB). 
+ \item Use spreadsheet software: Each table should be put on a single worksheet. At present, the file(s) must be saved in either \texttt{.xls} or \texttt{.xlsx} format for being imported with the R-package \texttt{XLConnect}.
+\end{enumerate}
+
+Each table has its own set of mandatory column as detailed in the subsequent sections. Within a table, the columns may appear in any order.
+
+\subsubsection{Declaration of variables and parameters} \label{sec:input:tables:vars-pars}
+
+The explicit declaration of variables and parameters serves two purposes. First, it forces the model developer to document all items occuring in the model's equations. Second, it eliminates the need for naming conventions to distinguish parameters from state variables. The columns typically appearing in the tables of variable or parameter declaration are listed in Tab.~\ref{tab:vars-pars}. Note that only the first three columns are required for basic uses of \rodeo. The remaining non-mandatory columns are only needed when a model is run through the \rodeoApp{} graphical user interface (GUI) or in a Monte-Carlo simulation (MCS).
+
+\begin{table}[h!]
+  \caption{Columns required in tables declaring variables or parameters. \label{tab:vars-pars}}
+  \begin{tabular}{llp{0.55\textwidth}} \hline\hline
+    \textbf{Column name} & \textbf{Required} & \textbf{Contents} \\ \hline
+    name & always & See Sec.~\ref{sec:input:conventions:names} for conventions. \\
+    unit & always & Text; strongly suggested but not currently checked. \\
+    description & always & Free text description. \\
+    user & GUI only & Must be \texttt{TRUE} or \texttt{FALSE}. Controls whether the item can be modified in GUI. \\
+    label & GUI only & Label used in GUI. \\
+    default & GUI only & Suggested value in GUI. \\
+    upper & MCS only & Upper limit of sampling range for MCS. \\
+    lower & MCS only & Lower limit of sampling range for MCS. \\
+    \hline
+  \end{tabular}
+\end{table}
+
+In general, it is advisable to declare variables and parameters individually using two separate tables. However, it is also possible to declare items of both categories in a common table. Such a table must have an additional column (e.g. named 'type') to distinguish between the two categories.
+
+\subsubsection{Declaration of functions} \label{sec:input:tables:funcs}
+
+Any functions appearing in the process rate expressions or stoichiometry factor expressions need to be declared. This is true even for functions being intrinsic to the target languages of the \rodeo{} code generator (see Sec.\ref{sec:targetLanguages}). The required declaration information is summarized in Table~\ref{tab:funs}.
+
+\begin{table}[h!]
+  \caption{Columns required in the table of function declaration. \label{tab:funs}}
+  \begin{tabular}{lp{0.75\textwidth}} \hline\hline
+    \textbf{Column name} & \textbf{Contents} \\ \hline
+    name & See Sec.~\ref{sec:input:conventions:names} for conventions. \\
+    unit & Text; strongly suggested but not currently checked. \\
+    description & Free text description. \\
+    \hline
+  \end{tabular}
+\end{table}
+
+The sole declaration of a function is not sufficient to make it callable from within a source code: There must also be a definition of the function. In the context of \rodeo{}, the following rules apply:
+
+\begin{itemize}
+ \item If the function is intrinsic to all target languages (see Sec.~\ref{sec:targetLanguages}), the function still needs to be declared but it must not be defined. Typical examples: $exp()$, $log()$.
+ \item If the function is not intrinsic to any of the target languages (see Sec.~\ref{sec:targetLanguages}), the function must be declared and defined. Typical examples: $fancyFunction()$.
+ \item If the function is only intrinsic to only one/some of the target languages (see Sec.~\ref{sec:targetLanguages}), a wrapper function must be declared under a different name and a definition must be supplied as well. The definition should make use of the intrinsic function(s) where applicable.
+\end{itemize}
+
+And finally:
+
+\begin{itemize}
+ \item When using R as the target language, function definitions must be in the R language.
+ \item When using another target language, functions needing a definition must be implemented in both R and the particular target language.
+\end{itemize}
+
+In cases where no functions appear in mathematical expressions at all, it is usually appropriate to provide an empty table (or a dummy table) with the column names listed in Table~\ref{tab:funs}.
+
+\subsubsection{Declaration of process rates} \label{sec:input:tables:processes}
+
+The table used to declare the process rates has four mandatory fields as described in Tab.~\ref{tab:processes}.
+
+\begin{table}[!h]
+  \caption{Columns required in the table of process rates. \label{tab:processes}}
+  \begin{tabular}{lp{0.75\textwidth}} \hline\hline
+    \textbf{Column name} & \textbf{Contents} \\ \hline
+    name & See Sec.~\ref{sec:input:conventions:names} for conventions. \\
+    unit & Text; strongly suggested but not currently checked. \\
+    description & Free text description. \\
+    expression & Mathematical expression containing operators and declared identifiers (i.~e. state variables, parameters, and functions). See also Sec.~\ref{sec:input:conventions}. \\
+    \hline
+  \end{tabular}
+\end{table}
+
+\subsubsection{Tabular representation of the stoichiometry matrix} \label{sec:input:tables:stoichiometry}
+
+The stoichiometry matrix is not actually written as a matrix but as a table holding the concatenated columns (or rows). The required format is described in  Tab.~\ref{tab:stoichiometry}.
+
+In real-world models, the stoichiometry matrix often contains many cells with zeros. These zeros indicate that the derivative of a particular state variable (denoted in the column header) is not \emph{directly} linked to a particular process (denoted in the row header). Importantly, in the tabular representation of the matrix, all rows with a stoichiometry factor of zero can be skipped (don't need to be written). Hence, a complete stoichiometry table should consist of as many rows as there are non-zero cells in the stoichiometry matrix.
+
+The rows of the stoichiometry table can be in any order. It may be a useful convention, however, to first provide all records for a state variable 'a' before continuing with another state variable 'b'.
+
+\begin{table}[!h]
+  \caption{Columns required in the stoichiometry table. \label{tab:stoichiometry}}
+  \begin{tabular}{lp{0.75\textwidth}} \hline\hline
+    \textbf{Column name} & \textbf{Contents} \\ \hline
+    variable & Names of state variables that have been declared (see Tab.~\ref{tab:vars-pars}). \\
+    process & Names of processes that have been declared in Tab.~\ref{tab:processes}. \\
+    expression & Mathematical expressions for the stoichiometry factors that link processes and variables. These expressions may contain operators and declared identifiers (i.~e. state variables, parameters, and functions). See also Sec.~\ref{sec:input:conventions}. \\
+    \hline
+  \end{tabular}
+\end{table}
+
+\end{document}
