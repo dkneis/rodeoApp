@@ -15,15 +15,16 @@ ui_generate= function(vars, pars) {
   code=paste0(code,"        p(style='",headStyle,"', 'Parameters')",newline)
   code=paste0(code,"      ),",newline)
   code=paste0(code,"      column(2,",newline)
-  code=paste0(code,"        p(style='",headStyle,"', 'Init. values')",newline)
+  code=paste0(code,"        p(style='",headStyle,"', 'Variables')",newline)
   code=paste0(code,"      )",newline)
   code=paste0(code,"    ),",newline)
   code=paste0(code,"    fluidRow(",newline)
+  # Parameters
   rows= which(pars$user)
   code=paste0(code,"      column(2,style = 'overflow-y:scroll; max-height: 800px',",newline)
   if (length(rows) > 0) {
     for (i in rows) {
-      code= paste0(code,"      div(style='",labStyle,"',textInput('",pars$name[i],"', label = '",
+      code=paste0(code,"      div(style='",labStyle,"',textInput('",pars$name[i],"', label = '",
         pars$label[i],"', value=",pars$default[i],"))",
         ifelse(i==rows[length(rows)],"",","),newline)
     }
@@ -31,18 +32,22 @@ ui_generate= function(vars, pars) {
     code=paste0(code,"p('No visible items')",newline)
   }
   code=paste0(code,"      ),",newline)
-  rows= which(vars$user)
+  # Variables
   code=paste0(code,"      column(2,style = 'overflow-y:scroll; max-height: 800px',",newline)
-  if (length(rows) > 0) {
-    for (i in rows) {
-      code= paste0(code,"        div(style='",labStyle,"',textInput('",vars$name[i],"', label = '",
-        vars$label[i],"', value=",vars$default[i],"))",
-        ifelse(i==rows[length(rows)],"",","),newline)
-    }
-  } else {
-    code=paste0(code,"p('No visible items')",newline)
+  for (i in 1:nrow(vars)) {
+    code=paste0(code,"        fluidRow(",newline)
+    code=paste0(code,"          column(10,",newline)
+    code=paste0(code,"            div(style='",labStyle,"',textInput('",vars$name[i],
+      "', label = '",vars$label[i],"', value=",vars$default[i],"))",newline)
+    code=paste0(code,"          ),",newline)
+    code=paste0(code,"          column(2,",newline)
+    code=paste0(code,"            div(style='",labStyle,"',checkboxInput('",vars$name[i],
+      ".draw', label = '', value=FALSE))",newline)
+    code=paste0(code,"          )",newline)
+    code=paste0(code,"        )",ifelse(i==nrow(vars),"",","),newline)
   }
   code=paste0(code,"      ),",newline)
+
   code=paste0(code,"      column(8,",newline)
   code=paste0(code,"        fluidRow(",newline)
   code=paste0(code,"          column(12,",newline)

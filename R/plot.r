@@ -27,6 +27,7 @@ plotStoi= function(model, vars, pars, funsR) {
 #' @param out Object returned from latest call to \code{simul}.
 #' @param out_old Object returned from an earlier call to \code{simul}.
 #' @param model Object of class \code{rodeo} representing the model.
+#' @param draw Named logical vector to enable plotting of individual variables.
 #' @param yrange Range of the y-axis.
 #' @param showOld Logical. Enables/disables plotting of data in \code{out_old}.
 #'
@@ -35,7 +36,7 @@ plotStoi= function(model, vars, pars, funsR) {
 #' @author David Kneis \email{david.kneis@@tu-dresden.de}
 #'
 #' @export
-plotStates= function(out, out_old, model, yrange, showOld) {
+plotStates= function(out, out_old, model, draw, yrange, showOld) {
   clrHelp= colorRamp(c("violetred4","orangered2","indianred",
     "darkseagreen","dodgerblue3","blue4"), space="rgb")
   clr= function(i) {
@@ -51,12 +52,14 @@ plotStates= function(out, out_old, model, yrange, showOld) {
   if ((!is.null(out_old)) && showOld) {
     times_old= out_old[,1]
     for (i in 1:model$lenVars()) {
-      lines(times_old, out_old[,1+i], lty=i, lwd=2, col="white") 
+      if (draw[model$namesVars()[i]])
+        lines(times_old, out_old[,1+i], lty=i, lwd=2, col="white") 
     }
   }
   # Latest output
   for (i in 1:model$lenVars()) {
-    lines(times, out[,1+i], lty=i, lwd=2, col=clr(i)) 
+    if (draw[model$namesVars()[i]])
+      lines(times, out[,1+i], lty=i, lwd=2, col=clr(i)) 
   }
   # Legend
   omar=par("mar")

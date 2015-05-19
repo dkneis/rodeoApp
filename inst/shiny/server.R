@@ -1,18 +1,21 @@
 
-# Get default values
+# Get info on parameters and variables
+
 par= get("rodeoApp.pars",envir=globalenv())
-var= get("rodeoApp.vars",envir=globalenv())
-required= c("name","default")
+required= c("name","label","default","user")
 if (!all(required %in% names(par)))
   stop(paste0("incomplete table of parameters; the required columns are: '",
     paste(required,collapse="', '"),"'"))
 par= par[,required]
+
+var= get("rodeoApp.vars",envir=globalenv())
+required= c("name","label","default")
 if (!all(required %in% names(var)))
   stop(paste0("incomplete table of variables; the required columns are: '",
     paste(required,collapse="', '"),"'"))
 var= var[,required]
 
-# Initialize variables for plotting of reference solution
+# Initializations for plotting of reference solution
 out_ref= NULL
 setRefCounter= 0
 
@@ -29,15 +32,22 @@ shinyServer(function(input, output) {
         currentPar$value[i]= input[[names(input)[pos]]]
       }
     }
-    currentVar= data.frame(name=var$name, value=var$default, stringsAsFactors=FALSE)
+    currentVar= data.frame(name=var$name, value=var$default, draw=FALSE, stringsAsFactors=FALSE)
     for (i in 1:nrow(currentVar)) {
       pos= match(currentVar$name[i], names(input))
       if (!is.na(pos)) {
         currentVar$value[i]= input[[names(input)[pos]]]
       }
+      pos= match(paste0(currentVar$name[i],".draw"), names(input))
+      if (!is.na(pos)) {
+        currentVar$draw[i]= input[[names(input)[pos]]]
+      }
     }
-    return(list(par=setNames(as.numeric(currentPar$value), currentPar$name),
-      var=setNames(as.numeric(currentVar$value), currentVar$name)))
+    return(list(
+      par=setNames(as.numeric(currentPar$value), currentPar$name),
+      var=setNames(as.numeric(currentVar$value), currentVar$name),
+      draw=setNames(as.logical(currentVar$draw), currentVar$name)
+    ))
   })
 
   output$plotStoi <- renderPlot({
@@ -52,6 +62,7 @@ shinyServer(function(input, output) {
       vars=userData()$var, pars= userData()$par,
       times=t, dllfile=get("rodeoApp.dllfile",envir=globalenv()))
     plotStates(out, out_ref, model=get("rodeoApp.model",envir=globalenv()),
+      draw=userData()$draw,
       yrange=10^as.numeric(c(input$y.min,input$y.max)), input$showRef)
     if (input$setRef > setRefCounter) {
       out_ref <<- out
