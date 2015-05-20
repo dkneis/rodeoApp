@@ -32,11 +32,16 @@ shinyServer(function(input, output) {
         currentPar$value[i]= input[[names(input)[pos]]]
       }
     }
-    currentVar= data.frame(name=var$name, value=var$default, draw=FALSE, stringsAsFactors=FALSE)
+    currentVar= data.frame(name=var$name, value=var$default, mult=1, draw=FALSE,
+      stringsAsFactors=FALSE)
     for (i in 1:nrow(currentVar)) {
       pos= match(currentVar$name[i], names(input))
       if (!is.na(pos)) {
         currentVar$value[i]= input[[names(input)[pos]]]
+      }
+      pos= match(paste0(currentVar$name[i],".mult"), names(input))
+      if (!is.na(pos)) {
+        currentVar$mult[i]= input[[names(input)[pos]]]
       }
       pos= match(paste0(currentVar$name[i],".draw"), names(input))
       if (!is.na(pos)) {
@@ -46,6 +51,7 @@ shinyServer(function(input, output) {
     return(list(
       par=setNames(as.numeric(currentPar$value), currentPar$name),
       var=setNames(as.numeric(currentVar$value), currentVar$name),
+      mult=setNames(as.numeric(currentVar$mult), currentVar$name),
       draw=setNames(as.logical(currentVar$draw), currentVar$name)
     ))
   })
@@ -62,7 +68,7 @@ shinyServer(function(input, output) {
       vars=userData()$var, pars= userData()$par,
       times=t, dllfile=get("rodeoApp.dllfile",envir=globalenv()))
     plotStates(out, out_ref, model=get("rodeoApp.model",envir=globalenv()),
-      draw=userData()$draw,
+      mult=userData()$mult, draw=userData()$draw,
       yrange=10^as.numeric(c(input$y.min,input$y.max)), input$showRef)
     if (input$setRef > setRefCounter) {
       out_ref <<- out

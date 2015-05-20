@@ -4,7 +4,7 @@
 \alias{plotStates}
 \title{Plot state variables}
 \usage{
-plotStates(out, out_old, model, draw, yrange, showOld)
+plotStates(out, out_old, model, mult, draw, yrange, showOld)
 }
 \arguments{
 \item{out}{Object returned from latest call to \code{simul}.}
@@ -12,6 +12,8 @@ plotStates(out, out_old, model, draw, yrange, showOld)
 \item{out_old}{Object returned from an earlier call to \code{simul}.}
 
 \item{model}{Object of class \code{rodeo} representing the model.}
+
+\item{mult}{Named vector with multipliers to apply to variables before plotting.}
 
 \item{draw}{Named logical vector to enable plotting of individual variables.}
 
