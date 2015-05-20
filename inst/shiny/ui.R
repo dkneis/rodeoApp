@@ -118,6 +118,7 @@ ui_generate= function(vars, pars) {
 #write(x=code, file=gsub(pattern="\\",replacement="/",x=f,fixed=TRUE))
 #cat("written to",f,"\n")
 
+#BLA comment
 ################################################################################
 # Create and execute GUI code
 
