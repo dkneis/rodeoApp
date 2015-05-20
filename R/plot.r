@@ -30,6 +30,7 @@ plotStoi= function(model, vars, pars, funsR) {
 #' @param mult Named vector with multipliers to apply to variables before plotting.
 #' @param draw Named logical vector to enable plotting of individual variables.
 #' @param yrange Range of the y-axis.
+#' @param logY Logical to switch between linear and log axis.
 #' @param showOld Logical. Enables/disables plotting of data in \code{out_old}.
 #'
 #' @return \code{NULL}.
@@ -37,7 +38,7 @@ plotStoi= function(model, vars, pars, funsR) {
 #' @author David Kneis \email{david.kneis@@tu-dresden.de}
 #'
 #' @export
-plotStates= function(out, out_old, model, mult, draw, yrange, showOld) {
+plotStates= function(out, out_old, model, mult, draw, yrange, logY, showOld) {
   clrHelp= colorRamp(c("violetred4","orangered2","indianred",
     "darkseagreen","dodgerblue3","blue4"), space="rgb")
   clr= function(i) {
@@ -45,10 +46,11 @@ plotStates= function(out, out_old, model, mult, draw, yrange, showOld) {
   }
   times= out[,1]
   layout(matrix(1:2,ncol=2),widths=c(8,2))
-  plot(range(times), yrange, type="n", log="y",
+  plot(range(times), yrange, type="n", log=ifelse(logY,"y",""),
     xlab="Time", ylab="State variable(s)")
   usr= par("usr")
-  rect(xleft=usr[1], xright=usr[2], ybottom=10^usr[3], ytop=10^usr[4], col="lightgrey")
+  rect(xleft=usr[1], xright=usr[2], ybottom=ifelse(logY,10^usr[3],usr[3]),
+    ytop=ifelse(logY,10^usr[4],usr[4]), col="lightgrey")
   # Previous output
   if ((!is.null(out_old)) && showOld) {
     times_old= out_old[,1]
@@ -70,11 +72,13 @@ plotStates= function(out, out_old, model, mult, draw, yrange, showOld) {
   omar=par("mar")
   par(mar=rep(0.1,4))
   plot(0,0,bty="n",type="n",xaxt="n",yaxt="n",xlab="",ylab="")
+  inds= which(model$namesVars() %in% names(draw)[draw])
   legend("left",
     bty="n", seg.len=1.5,
-    lty=1:model$lenVars(), lwd=2, col=clr(1:model$lenVars()),
-    legend=model$namesVars())
+    lty=inds, lwd=2, col=clr(inds),
+    legend=model$namesVars()[inds])
   par(mar=omar)
   layout(matrix(1,ncol=1))
 }
+
 

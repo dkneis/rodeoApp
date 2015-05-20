@@ -69,7 +69,8 @@ shinyServer(function(input, output) {
       times=t, dllfile=get("rodeoApp.dllfile",envir=globalenv()))
     plotStates(out, out_ref, model=get("rodeoApp.model",envir=globalenv()),
       mult=userData()$mult, draw=userData()$draw,
-      yrange=10^as.numeric(c(input$y.min,input$y.max)), input$showRef)
+      yrange=as.numeric(c(input$y.min,input$y.max)), logY=input$logY,
+      showOld=input$showRef)
     if (input$setRef > setRefCounter) {
       out_ref <<- out
       setRefCounter <<- input$setRef 

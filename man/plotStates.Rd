@@ -4,7 +4,7 @@
 \alias{plotStates}
 \title{Plot state variables}
 \usage{
-plotStates(out, out_old, model, mult, draw, yrange, showOld)
+plotStates(out, out_old, model, mult, draw, yrange, logY, showOld)
 }
 \arguments{
 \item{out}{Object returned from latest call to \code{simul}.}
@@ -18,6 +18,8 @@ plotStates(out, out_old, model, mult, draw, yrange, showOld)
 \item{draw}{Named logical vector to enable plotting of individual variables.}
 
 \item{yrange}{Range of the y-axis.}
+
+\item{logY}{Logical to switch between linear and log axis.}
 
 \item{showOld}{Logical. Enables/disables plotting of data in \code{out_old}.}
 }
