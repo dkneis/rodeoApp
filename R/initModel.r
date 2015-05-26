@@ -1,6 +1,34 @@
-################################################################################
-# Initializes a model, i.e. creates the shared library from user inputs.
-# Actual code generation is outsourced to 'generateLib' (see below).
+# Note: Actual code generation is outsourced to 'generateLib' (see below).
+
+#' Create model object and generate code
+#'
+#' Creates a model object from user inputs and builds a shared library
+#' from generated Fortran code.
+#'
+#' @param dir Directory where input files are located. This value is added as a
+#'   prefix to any file names (i.e. \code{xlFile}, \code{funsR}, \code{funsF}).
+#' @param xlFile Base name of file in MS Excel format with the model definition.
+#' @param funsR Base name of file with function definitions in R.
+#' @param funsF Base name of file with function definitions in Fortran 95.
+#' @param sheets Named vector with required elements 'vars', 'pars', 'funs',
+#'   'pros', and 'stoi'. These elements define the names of the worksheets in
+#'   \code{xlFile} holding the declaration of variables, parameters, functions,
+#'   process rates, and stoichiometry factors, respectively.
+#'
+#' @return A list with the following components.
+#' \itemize{
+#'   \item{\code{model} : } Object of class \code{rodeo} representing the model.
+#'   \item{\code{dllfile} : } Shared library with compiled Fortran code.
+#'   \item{\code{funsR} : } Full name of the file with R functions.
+#'   \item{\code{vars} : } Worksheet with variable declarations (data frame).
+#'   \item{\code{pars} : } Worksheet with parameter declarations (data frame).
+#' }
+#'
+#' @note An error is generated if the integration was not successful.
+#'
+#' @author David Kneis \email{david.kneis@@tu-dresden.de}
+#'
+#' @export
 
 initModel= function(dir, xlFile, funsR, funsF, sheets) {
   # Set/check file names

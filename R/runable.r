@@ -3,15 +3,7 @@
 #' Runs a rodeo-based model in a shiny GUI to allow for variation of parameters
 #' and/or initial values.
 #'
-#' @param dir Directory where input files are located. This value is added as a
-#'   prefix to any file names (i.e. \code{xlFile}, \code{funsR}, \code{funsF}).
-#' @param xlFile Base name of file in MS Excel format with the model definition.
-#' @param funsR Base name of file with function definitions in R.
-#' @param funsF Base name of file with function definitions in Fortran 95.
-#' @param sheets Named vector with required elements 'vars', 'pars', 'funs',
-#'   'pros', and 'stoi'. These elements define the names of the worksheets in
-#'   \code{xlFile} holding the declaration of variables, parameters, functions,
-#'   process rates, and stoichiometry factors, respectively.
+#' @inheritParams initModel
 #'
 #' @return \code{NULL}
 #'
