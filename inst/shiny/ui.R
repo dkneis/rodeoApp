@@ -31,7 +31,7 @@ ui_generate= function(vars, pars) {
   code=paste0(code,"    ),",newline)
   code=paste0(code,"    fluidRow(",newline)
   # Parameters
-  rows= which(pars$user)
+  rows= which(as.logical(pars$user))
   code=paste0(code,"      column(2,style = 'overflow-y:scroll; max-height: 800px',",newline)
   if (length(rows) > 0) {
     for (i in rows) {
