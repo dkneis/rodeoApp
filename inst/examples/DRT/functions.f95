@@ -2,9 +2,9 @@ module functions
   implicit none
   contains
 
-  double precision function fun (conc,a,b,p,q)
-    double precision, intent(in):: conc,a,b,p,q
-    fun= 0.5d0 - (a + b * tanh(p * (log(conc + 1.1d0) - q)))
+  double precision function fun (conc,z,a,b,p,q)
+    double precision, intent(in):: conc,z,a,b,p,q
+    fun= 0.5 - (a + b * tanh(p * (log(conc + 1.1d0) - q))) + z
   end function
 
   double precision function fk (K,D,R,T)
