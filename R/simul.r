@@ -27,7 +27,10 @@ simul= function(model, vars, pars, times, dllfile) {
   out= deSolve::ode(y=vars, times=times, func="derivs_wrapped", dllname=dllname,
     initfunc="initmod", nout=model$lenPros(), outnames=model$namesPros(), parms=pars, NLVL=1)
   if (attr(out,which="istate",exact=TRUE)[1] != 2)
-    stop("Integration failed.")
+    stop(paste0("Integration failed.\n----- The initial values were:\n",
+      paste(names(vars),vars,sep="=",collapse="\n"),"\n----- The parameters were:\n",
+      paste(names(pars),pars,sep="=",collapse="\n")
+    ))
   dyn.unload(dllfile)
   # Return
   return(out)
