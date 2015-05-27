@@ -4,7 +4,9 @@
 \alias{initModel}
 \title{Create model object and generate code}
 \usage{
-initModel(dir, xlFile, funsR, funsF, sheets)
+initModel(dir = "", xlFile = "model.xlsx", funsR = "functions.r",
+  funsF = "functions.f95", sheets = c(vars = "vars", pars = "pars", funs =
+  "funs", pros = "pros", stoi = "stoi"))
 }
 \arguments{
 \item{dir}{Directory where input files are located. This value is added as a

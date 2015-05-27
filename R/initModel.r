@@ -30,7 +30,10 @@
 #'
 #' @export
 
-initModel= function(dir, xlFile, funsR, funsF, sheets) {
+initModel= function(
+  dir="", xlFile="model.xlsx", funsR="functions.r", funsF="functions.f95",
+  sheets= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi")
+) {
   # Set/check file names
   xlFile= paste(dir,xlFile,sep="/")
   if (!file.exists(xlFile))
