@@ -25,7 +25,7 @@ simul= function(model, vars, pars, times, dllfile) {
     x=basename(dllfile))
   dyn.load(dllfile)
   out= deSolve::ode(y=vars, times=times, func="derivs_wrapped", dllname=dllname,
-    initfunc="initmod", nout=nrow(model$PROS), parms=pars, NLVL=1)
+    initfunc="initmod", nout=model$lenPros(), outnames=model$namesPros(), parms=pars, NLVL=1)
   if (attr(out,which="istate",exact=TRUE)[1] != 2)
     stop("Integration failed.")
   dyn.unload(dllfile)
