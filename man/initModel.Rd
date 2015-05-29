@@ -15,7 +15,9 @@ and possibly the values of \code{tables}).}
 
 \item{xlFile}{Either the base name of file in MS Excel format holding
 the model definition or \code{NULL}. In the latter case, the model
-definition is read from delimited text files.}
+definition is read from delimited text files using
+\code{read.table(header=TRUE, sep=colsep)} where the last argument is
+under user control (see \code{colsep} below).}
 
 \item{funsR}{Base name of file with function definitions in R.}
 

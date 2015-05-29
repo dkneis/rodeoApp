@@ -10,7 +10,9 @@
 #'   and possibly the values of \code{tables}).
 #' @param xlFile Either the base name of file in MS Excel format holding
 #'   the model definition or \code{NULL}. In the latter case, the model
-#'   definition is read from delimited text files.
+#'   definition is read from delimited text files using
+#'   \code{read.table(header=TRUE, sep=colsep)} where the last argument is
+#'   under user control (see \code{colsep} below).
 #' @param funsR Base name of file with function definitions in R.
 #' @param funsF Base name of file with function definitions in Fortran 95.
 #' @param tables Named vector with required elements 'vars', 'pars', 'funs',
