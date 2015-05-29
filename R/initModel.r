@@ -6,25 +6,38 @@
 #' from generated Fortran code.
 #'
 #' @param dir Directory where input files are located. This value is added as a
-#'   prefix to any file names (i.e. \code{xlFile}, \code{funsR}, \code{funsF}).
-#' @param xlFile Base name of file in MS Excel format with the model definition.
+#'   prefix to any file names (i.e. \code{xlFile}, \code{funsR}, \code{funsF},
+#'   and possibly the values of \code{tables}).
+#' @param xlFile Either the base name of file in MS Excel format holding
+#'   the model definition or \code{NULL}. In the latter case, the model
+#'   definition is read from delimited text files.
 #' @param funsR Base name of file with function definitions in R.
 #' @param funsF Base name of file with function definitions in Fortran 95.
-#' @param sheets Named vector with required elements 'vars', 'pars', 'funs',
-#'   'pros', and 'stoi'. These elements define the names of the worksheets in
-#'   \code{xlFile} holding the declaration of variables, parameters, functions,
-#'   process rates, and stoichiometry factors, respectively.
+#' @param tables Named vector with required elements 'vars', 'pars', 'funs',
+#'   'pros', and 'stoi'. If a file name was supplied in \code{xlFile}, the
+#'   values are interpreted as the names of worksheets holding the declaration
+#'   of variables, parameters, functions, process rates, and stoichiometry
+#'   factors, respectively. If \code{xlFile} is an empty string, the values are
+#'   interpreted as the names of delimited text files holding the respective
+#'   information.
+#' @param colsep Specifies the column separator in text files. Only used if
+#'   \code{xlFile} is \code{NULL}.
 #'
 #' @return A list with the following components.
 #' \itemize{
 #'   \item{\code{model} : } Object of class \code{rodeo} representing the model.
 #'   \item{\code{dllfile} : } Shared library with compiled Fortran code.
 #'   \item{\code{funsR} : } Full name of the file with R functions.
-#'   \item{\code{vars} : } Worksheet with variable declarations (data frame).
-#'   \item{\code{pars} : } Worksheet with parameter declarations (data frame).
+#'   \item{\code{vars} : } Data frame with variable declarations.
+#'   \item{\code{pars} : } Data frame with parameter declarations.
 #' }
 #'
-#' @note An error is generated if the integration was not successful.
+#' @note Files in MS Excel format can also be created/edited with free software
+#'   such as, e.g., LibreOffice Calc.
+#'
+#'   Spreadsheets are typically more convenient to edit as compared to
+#'   delimited text files. However, with text files it is easier to track the
+#'   history of a model using version control software and/or diff tools.
 #'
 #' @author David Kneis \email{david.kneis@@tu-dresden.de}
 #'
@@ -32,42 +45,61 @@
 
 initModel= function(
   dir="", xlFile="model.xlsx", funsR="functions.r", funsF="functions.f95",
-  sheets= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi")
+  tables= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi"),
+  colsep=";"
 ) {
   # Set/check file names
-  xlFile= paste(dir,xlFile,sep="/")
-  if (!file.exists(xlFile))
-    stop("file with model definition not found ('",xlFile,"')")
   funsR= paste(dir,funsR,sep="/")
   if (!file.exists(funsR))
     stop("file with function definitions in R not found ('",funsR,"')")
   funsF= paste(dir,funsF,sep="/")
   if (!file.exists(funsF))
     stop("file with function definitions in Fortran 95 not found ('",funsF,"')")
-  # Check sheet names
+  # Check table names
   required= c("vars","pars","funs","pros","stoi")
-  if ((length(sheets) != 5) || !identical(sort(names(sheets)),
-    sort(required)) || !is.character(sheets))
-    stop("argument 'sheets' must be a vector of strings with elements '",
+  if ((length(tables) != 5) || !identical(sort(names(tables)),
+    sort(required)) || !is.character(tables))
+    stop("argument 'tables' must be a character vector with elements '",
       paste(required,collapse="', '"),"'")
-  # Read worksheets from Excel file and export tables to a dedicated environment
-  tryCatch({
-    wBook= XLConnect::loadWorkbook(xlFile)
-  }, error= function(e) {
-    stop(paste0("failed to import workbook from file '",xlFile,"'; details: ",e))
-  })
+  # Init list to hold the model definition tables
   tbl= list()
-  for (i in 1:length(sheets)) {
+  # Read tables from Excel worksheets
+  if (!is.null(xlFile)) {
+    xlFile= paste(dir,xlFile,sep="/")
+    if (!file.exists(xlFile))
+      stop("file with model definition not found ('",xlFile,"')")
     tryCatch({
-      tmp= XLConnect::readWorksheet(object=wBook, sheet=sheets[i])
-       # drop empty rows
-      tmp= subset(tmp, apply(tmp, 1, function(x) {!all(is.na(x))}))
+      wBook= XLConnect::loadWorkbook(xlFile)
     }, error= function(e) {
-      stop(paste0("failed to import data from worksheet '",sheets[i],
-        "' of workbook (i.e. file) '",xlFile,"'; details: ",e))
+      stop(paste0("failed to import workbook from file '",xlFile,"'; details: ",e))
     })
-    tbl[[i]]= tmp
-    names(tbl)[i]= sheets[i]
+    for (i in 1:length(tables)) {
+      tryCatch({
+        tmp= XLConnect::readWorksheet(object=wBook, sheet=tables[i])
+         # drop empty rows
+        tmp= subset(tmp, apply(tmp, 1, function(x) {!all(is.na(x))}))
+      }, error= function(e) {
+        stop(paste0("failed to import data from worksheet '",tables[i],
+          "' of workbook (i.e. file) '",xlFile,"'; details: ",e))
+      })
+      tbl[[i]]= tmp
+      names(tbl)[i]= tables[i]
+    }
+  # Read tables from tabular text files
+  } else {
+    for (i in 1:length(tables)) {
+      f= paste(dir,tables[i],sep="/")
+      if (!file.exists(f))
+        stop("file with model definition, part '",names(tables)[i],"', not found ('",f,"')")
+      tryCatch({
+        tmp= read.table(file=f,sep=colsep,header=TRUE)
+      }, error= function(e) {
+        stop(paste0("failed to import data from text file '",f,
+          "'; details: ",e))
+      })
+      tbl[[i]]= tmp
+      names(tbl)[i]= tables[i]
+    }
   }
   ##print(tbl)
   # Create rodeo object

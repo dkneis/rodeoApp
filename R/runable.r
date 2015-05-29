@@ -22,10 +22,12 @@
 
 runGUI= function(
   dir="", xlFile="model.xlsx", funsR="functions.r", funsF="functions.f95",
-  sheets= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi")
+  tables= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi"),
+  colsep=";"
 ) {
   # Run init
-  ini= initModel(dir=dir, xlFile=xlFile, funsR=funsR, funsF=funsF, sheets=sheets)
+  ini= initModel(dir=dir, xlFile=xlFile, funsR=funsR, funsF=funsF,
+    tables=tables, colsep=colsep)
   # Export data to global environment for use in shiny server/ui
   assign(x="rodeoApp.model", value=ini$model, envir=globalenv())
   assign(x="rodeoApp.dllfile", value=ini$dllfile, envir=globalenv())
@@ -86,11 +88,13 @@ runMCS= function(
   nsig=4,
   overwrite=FALSE,
   dir="", xlFile="model.xlsx", funsR="functions.r", funsF="functions.f95",
-  sheets= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi"),
+  tables= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi"),
+  colsep=";",
   silent=FALSE
 ) {
   # Initialize model
-  ini= initModel(dir=dir, xlFile=xlFile, funsR=funsR, funsF=funsF, sheets=sheets)
+  ini= initModel(dir=dir, xlFile=xlFile, funsR=funsR, funsF=funsF,
+    tables=tables, colsep=colsep)
   # Set/check output files
   outfiles= c(var="var.txt", par="par.txt", sim="sim.txt")
   outfiles= setNames(paste(outdir, outfiles, sep="/"), names(outfiles))

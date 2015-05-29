@@ -5,23 +5,32 @@
 \title{Create model object and generate code}
 \usage{
 initModel(dir = "", xlFile = "model.xlsx", funsR = "functions.r",
-  funsF = "functions.f95", sheets = c(vars = "vars", pars = "pars", funs =
-  "funs", pros = "pros", stoi = "stoi"))
+  funsF = "functions.f95", tables = c(vars = "vars", pars = "pars", funs =
+  "funs", pros = "pros", stoi = "stoi"), colsep = ";")
 }
 \arguments{
 \item{dir}{Directory where input files are located. This value is added as a
-prefix to any file names (i.e. \code{xlFile}, \code{funsR}, \code{funsF}).}
+prefix to any file names (i.e. \code{xlFile}, \code{funsR}, \code{funsF},
+and possibly the values of \code{tables}).}
 
-\item{xlFile}{Base name of file in MS Excel format with the model definition.}
+\item{xlFile}{Either the base name of file in MS Excel format holding
+the model definition or \code{NULL}. In the latter case, the model
+definition is read from delimited text files.}
 
 \item{funsR}{Base name of file with function definitions in R.}
 
 \item{funsF}{Base name of file with function definitions in Fortran 95.}
 
-\item{sheets}{Named vector with required elements 'vars', 'pars', 'funs',
-  'pros', and 'stoi'. These elements define the names of the worksheets in
-  \code{xlFile} holding the declaration of variables, parameters, functions,
-  process rates, and stoichiometry factors, respectively.}
+\item{tables}{Named vector with required elements 'vars', 'pars', 'funs',
+'pros', and 'stoi'. If a file name was supplied in \code{xlFile}, the
+values are interpreted as the names of worksheets holding the declaration
+of variables, parameters, functions, process rates, and stoichiometry
+factors, respectively. If \code{xlFile} is an empty string, the values are
+interpreted as the names of delimited text files holding the respective
+information.}
+
+\item{colsep}{Specifies the column separator in text files. Only used if
+  \code{xlFile} is \code{NULL}.}
 }
 \value{
 A list with the following components.
@@ -29,8 +38,8 @@ A list with the following components.
   \item{\code{model} : } Object of class \code{rodeo} representing the model.
   \item{\code{dllfile} : } Shared library with compiled Fortran code.
   \item{\code{funsR} : } Full name of the file with R functions.
-  \item{\code{vars} : } Worksheet with variable declarations (data frame).
-  \item{\code{pars} : } Worksheet with parameter declarations (data frame).
+  \item{\code{vars} : } Data frame with variable declarations.
+  \item{\code{pars} : } Data frame with parameter declarations.
 }
 }
 \description{
@@ -38,7 +47,12 @@ Creates a model object from user inputs and builds a shared library
 from generated Fortran code.
 }
 \note{
-An error is generated if the integration was not successful.
+Files in MS Excel format can also be created/edited with free software
+  such as, e.g., LibreOffice Calc.
+
+  Spreadsheets are typically more convenient to edit as compared to
+  delimited text files. However, with text files it is easier to track the
+  history of a model using version control software and/or diff tools.
 }
 \author{
 David Kneis \email{david.kneis@tu-dresden.de}

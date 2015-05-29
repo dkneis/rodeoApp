@@ -6,8 +6,8 @@
 \usage{
 runMCS(outdir, times, nruns, nsig = 4, overwrite = FALSE, dir = "",
   xlFile = "model.xlsx", funsR = "functions.r", funsF = "functions.f95",
-  sheets = c(vars = "vars", pars = "pars", funs = "funs", pros = "pros", stoi
-  = "stoi"), silent = FALSE)
+  tables = c(vars = "vars", pars = "pars", funs = "funs", pros = "pros", stoi
+  = "stoi"), colsep = ";", silent = FALSE)
 }
 \arguments{
 \item{outdir}{Output directory. Should be empty unless \code{overwrite} is \code{TRUE}.}
@@ -22,18 +22,27 @@ a reasonably small value for large \code{nruns} in order to save disk space.}
 \item{overwrite}{Logical. Is it OK to overwrite existing output files?}
 
 \item{dir}{Directory where input files are located. This value is added as a
-prefix to any file names (i.e. \code{xlFile}, \code{funsR}, \code{funsF}).}
+prefix to any file names (i.e. \code{xlFile}, \code{funsR}, \code{funsF},
+and possibly the values of \code{tables}).}
 
-\item{xlFile}{Base name of file in MS Excel format with the model definition.}
+\item{xlFile}{Either the base name of file in MS Excel format holding
+the model definition or \code{NULL}. In the latter case, the model
+definition is read from delimited text files.}
 
 \item{funsR}{Base name of file with function definitions in R.}
 
 \item{funsF}{Base name of file with function definitions in Fortran 95.}
 
-\item{sheets}{Named vector with required elements 'vars', 'pars', 'funs',
-  'pros', and 'stoi'. These elements define the names of the worksheets in
-  \code{xlFile} holding the declaration of variables, parameters, functions,
-  process rates, and stoichiometry factors, respectively.}
+\item{tables}{Named vector with required elements 'vars', 'pars', 'funs',
+'pros', and 'stoi'. If a file name was supplied in \code{xlFile}, the
+values are interpreted as the names of worksheets holding the declaration
+of variables, parameters, functions, process rates, and stoichiometry
+factors, respectively. If \code{xlFile} is an empty string, the values are
+interpreted as the names of delimited text files holding the respective
+information.}
+
+\item{colsep}{Specifies the column separator in text files. Only used if
+  \code{xlFile} is \code{NULL}.}
 
 \item{silent}{Logical. Used to switch diagnostic messages on/off.}
 }

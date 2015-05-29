@@ -1,6 +1,8 @@
 library(rodeoApp)
 #runGUI(dir=system.file("examples/DRT", package="rodeoApp"))
+
 runGUI(dir="/home/dkneis/tudd/dynaTrait/claudia")
+#runGUI(dir="/home/dkneis/tudd/dynaTrait/claudia", xlFile=NULL, colsep="\t")
 
 #library(rodeoApp)
 #runMCS(
