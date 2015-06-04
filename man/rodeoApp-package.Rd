@@ -2,9 +2,13 @@
 % Please edit documentation in R/00_rodeoApp.r
 \docType{package}
 \name{rodeoApp-package}
+\alias{rodeoApp}
 \alias{rodeoApp-package}
-\title{Run a rodeo-based model as a shiny application}
+\title{Interfaces for rodeo-based models}
 \description{
-Type \code{help(package="rat")} to inspect the package description.
+This package provides convenient interfaces for rodeo-based models. In
+particular, it allows for running a rodeo-based from a (shiny) graphical user
+interface (see \code{\link{runGUI}}). Type \code{help(package="rodeoApp")} to
+inspect the package description.
 }
 
