@@ -112,11 +112,11 @@ ui_generate= function(vars, pars) {
   return(code)
 }
 
-code= ui_generate(vars=get("rodeoApp.vars",envir=globalenv()),
-  pars=get("rodeoApp.pars",envir=globalenv()))
-f= tempfile()
-write(x=code, file=gsub(pattern="\\",replacement="/",x=f,fixed=TRUE))
-cat("written to",f,"\n")
+#code= ui_generate(vars=get("rodeoApp.vars",envir=globalenv()),
+#  pars=get("rodeoApp.pars",envir=globalenv()))
+#f= tempfile()
+#write(x=code, file=gsub(pattern="\\",replacement="/",x=f,fixed=TRUE))
+#cat("written to",f,"\n")
 
 
 # Alternative comment
