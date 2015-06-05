@@ -1,10 +1,25 @@
-library(rodeoApp)
+
+remove.packages(c("rodeo","rodeoApp"))
+
+if (!("devtools" %in% installed.packages()[,1]))
+install.packages("devtools")
+library("devtools")
+
+if (!("rodeo" %in% installed.packages()[,1]))
+install_github("dkneis/rodeo")
+library("rodeo")
+
+if (!("rodeoApp" %in% installed.packages()[,1]))
+install_github("dkneis/rodeoApp")
+library("rodeoApp")
+
+runGUI(dir="/home/dkneis/Dropbox/HS-Study-Project/intermediate_Model/Model_table")
+
 #runGUI(dir=system.file("examples/DRT", package="rodeoApp"))
 
 #runGUI(dir="/home/dkneis/tudd/dynaTrait/claudia")
 #runGUI(dir="/home/dkneis/tudd/dynaTrait/claudia", xlFile=NULL, colsep="\t")
 
-runGUI(dir="/home/dkneis/Dropbox/HS-Study-Project/intermediateModel/Model_table")
 
 #library(rodeoApp)
 #runMCS(

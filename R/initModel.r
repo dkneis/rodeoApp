@@ -176,8 +176,9 @@ generateLib= function(model, source_f_fun) {
     x=tempdir(), fixed=TRUE),"/",dllname,.Platform$dynlib.ext)
   if (file.exists(dllfile))
     invisible(file.remove(dllfile))
-  command= paste0("R CMD SHLIB ",source_f_fun," ",source_f_gen," ",source_f_wrp,
-    " --preclean --clean -o ",dllfile)
+  command= paste0("R CMD SHLIB ",shQuote(source_f_fun)," ",shQuote(source_f_gen),
+    " ",shQuote(source_f_wrp),
+    " --preclean --clean -o ",shQuote(dllfile))
   if (system(command) != 0)
     stop(paste0("Error running '",command,"'"))
   invisible(file.remove(list.files(pattern=".+[.]mod")))
