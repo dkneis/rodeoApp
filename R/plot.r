@@ -14,9 +14,6 @@
 #'
 #' @export
 plotStoi= function(model, vars, pars, funsR) {
-
-cat("funsR '",funsR,"' exists?: ", file.exists(funsR), "\n")
-
   source(funsR)
   model$plot(c(vars, pars))
   return(NULL)
