@@ -57,7 +57,7 @@ library("devtools")
 
 # Now install and load rodeo
 if (!("rodeo" %in% installed.packages()[,1]))
-  install_github("dkneis/rodeo")
+  install_github("dkneis/rodeo", build_vignettes=TRUE)
 library("rodeo")
 \end{verbatim}
 
