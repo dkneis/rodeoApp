@@ -72,36 +72,32 @@ ui_generate= function(vars, pars) {
   code=paste0(code,"        ),",newline)
   code=paste0(code,"        fluidRow(",newline)
   code=paste0(code,"          column(2,",newline)
-  code=paste0(code,"            div(style='",labStyle,
-    "',textInput('time.max', label = 'max. time', value=10))",newline)
+  code=paste0(code,"            div(style='",labStyle,"',textInput('time.min', label = 'min. time', value=0))",newline)
   code=paste0(code,"          ),",newline)
   code=paste0(code,"          column(2,",newline)
-  code=paste0(code,"            div(style='",labStyle,
-    "',textInput('time.dt', label = 'time step', value=1))",newline)
+  code=paste0(code,"            div(style='",labStyle,"',textInput('time.max', label = 'max. time', value=10))",newline)
   code=paste0(code,"          ),",newline)
   code=paste0(code,"          column(2,",newline)
-  code=paste0(code,"            div(style='",labStyle,
-    "',textInput('y.min', label = 'min. Y', value=",
-    min(vars$default)*ifelse(min(vars$default) < 0,2,0.5),"))",newline)
-  code=paste0(code,"          ),",newline)
-  code=paste0(code,"          column(2,",newline)
-  code=paste0(code,"            div(style='",labStyle,
-    "',textInput('y.max', label = 'max. Y', value=",
-    max(vars$default)*ifelse(max(vars$default) < 0,0.5,2),"))",newline)
+  code=paste0(code,"            div(style='",labStyle,"',textInput('time.dt', label = 'time step', value=1))",newline)
   code=paste0(code,"          )",newline)
   code=paste0(code,"        ),",newline)
   code=paste0(code,"        fluidRow(",newline)
   code=paste0(code,"          column(2,",newline)
-  code=paste0(code,"            div(style='",labStyle,
-    "',actionButton('setRef', label='Set as ref.'))",newline)
+  code=paste0(code,"            div(style='",labStyle,"',textInput('y.min', label = 'min. Y', value=",min(vars$default)*ifelse(min(vars$default) < 0,2,0.5),"))",newline)
   code=paste0(code,"          ),",newline)
   code=paste0(code,"          column(2,",newline)
-  code=paste0(code,"            div(style='",labStyle,
-    "',checkboxInput('showRef', label='Show ref.', value = FALSE))",newline)
+  code=paste0(code,"            div(style='",labStyle,"',textInput('y.max', label = 'max. Y', value=",max(vars$default)*ifelse(max(vars$default) < 0,0.5,2),"))",newline)
   code=paste0(code,"          ),",newline)
-  code=paste0(code,"          column(4,",newline)
-  code=paste0(code,"            div(style='",labStyle,
-    "',checkboxInput('logY', label='Log Y', value = FALSE))",newline)
+  code=paste0(code,"          column(2,",newline)
+  code=paste0(code,"            div(style='",labStyle,"',checkboxInput('logY', label='Log Y', value = FALSE))",newline)
+  code=paste0(code,"          )",newline)
+  code=paste0(code,"        ),",newline)
+  code=paste0(code,"        fluidRow(",newline)
+  code=paste0(code,"          column(2,",newline)
+  code=paste0(code,"            div(style='",labStyle,"',actionButton('setRef', label='Set as ref.'))",newline)
+  code=paste0(code,"          ),",newline)
+  code=paste0(code,"          column(2,",newline)
+  code=paste0(code,"            div(style='",labStyle,"',checkboxInput('showRef', label='Show ref.', value = FALSE))",newline)
   code=paste0(code,"          )",newline)
   code=paste0(code,"        )",newline)
   code=paste0(code,"      )",newline)

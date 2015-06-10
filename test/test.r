@@ -1,5 +1,8 @@
+rm(list=ls())
 
-remove.packages(c("rodeo","rodeoApp"))
+reinstall= FALSE
+
+if (reinstall) remove.packages(c("rodeo","rodeoApp"))
 
 if (!("devtools" %in% installed.packages()[,1]))
 install.packages("devtools")
@@ -13,9 +16,9 @@ if (!("rodeoApp" %in% installed.packages()[,1]))
 install_github("dkneis/rodeoApp")
 library("rodeoApp")
 
-runGUI(dir="/home/dkneis/Dropbox/HS-Study-Project/intermediate_Model/Model_table")
+#runGUI(dir="/home/dkneis/Dropbox/HS-Study-Project/intermediate_Model/Model_table")
 
-#runGUI(dir=system.file("examples/DRT", package="rodeoApp"))
+runGUI(dir=system.file("examples/DRT", package="rodeoApp"))
 
 #runGUI(dir="/home/dkneis/tudd/dynaTrait/claudia")
 #runGUI(dir="/home/dkneis/tudd/dynaTrait/claudia", xlFile=NULL, colsep="\t")

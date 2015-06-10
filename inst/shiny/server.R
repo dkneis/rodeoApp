@@ -63,7 +63,8 @@ shinyServer(function(input, output) {
   })
 
   output$plotStates <- renderPlot({
-    t= seq(from=0, to=as.numeric(input$time.max), by=as.numeric(input$time.dt))
+    t= seq(from=as.numeric(input$time.min), to=as.numeric(input$time.max),
+      by=as.numeric(input$time.dt))
     out= simul(model=get("rodeoApp.model",envir=globalenv()),
       vars=userData()$var, pars= userData()$par,
       times=t, dllfile=get("rodeoApp.dllfile",envir=globalenv()))
