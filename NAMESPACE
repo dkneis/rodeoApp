@@ -2,10 +2,10 @@
 
 export(initModel)
 export(plotStates)
-export(plotStoi)
 export(runGUI)
 export(runMCS)
 export(simul)
+export(visStoi)
 import(XLConnect)
 import(deSolve)
 import(devtools)

@@ -3,6 +3,7 @@
 # Method to generate GUI code
 
 ui_generate= function(vars, pars) {
+
   labStyle= "font-family: Arial Narrow; line-height: 10px; color: #3E566A"
   headStyle= "font-weight: bold; color: #3E566A"
   newline="\n"
@@ -53,11 +54,11 @@ ui_generate= function(vars, pars) {
     code=paste0(code,"          ),",newline)
     code=paste0(code,"          column(4,",newline)
     code=paste0(code,"            div(style='",labStyle,"',textInput('",vars$name[i],
-      ".mult', label = ' ', value=1))",newline)
+      ".mult', label = ' ', value=",vars$mult[i],"))",newline)
     code=paste0(code,"          ),",newline)
     code=paste0(code,"          column(3,",newline)
     code=paste0(code,"            div(style='",labStyle,"',checkboxInput('",vars$name[i],
-      ".draw', label = ' ', value=TRUE))",newline)
+      ".show', label = ' ', value=",as.logical(vars$show[i]),"))",newline)
     code=paste0(code,"          )",newline)
     code=paste0(code,"        )",ifelse(i==nrow(vars),"",","),newline)
   }
@@ -66,7 +67,6 @@ ui_generate= function(vars, pars) {
   code=paste0(code,"      column(8,",newline)
   code=paste0(code,"        fluidRow(",newline)
   code=paste0(code,"          column(12,",newline)
-  code=paste0(code,"            plotOutput(outputId='plotStoi', height='150px', width='50%'),",newline)
   code=paste0(code,"            plotOutput(outputId='plotStates', height='600px', width='90%')",newline)
   code=paste0(code,"          )",newline)
   code=paste0(code,"        ),",newline)
@@ -99,6 +99,12 @@ ui_generate= function(vars, pars) {
   code=paste0(code,"          column(2,",newline)
   code=paste0(code,"            div(style='",labStyle,"',checkboxInput('showRef', label='Show ref.', value = FALSE))",newline)
   code=paste0(code,"          )",newline)
+  code=paste0(code,"        ),",newline)
+  code=paste0(code,"        fluidRow(",newline)
+  code=paste0(code,"          column(12,",newline)
+  code=paste0(code,"            p(style='",headStyle,"', 'Stoichiometry matrix'),",newline)
+  code=paste0(code,"            htmlOutput(outputId='visStoi', inline=FALSE)",newline)
+  code=paste0(code,"          )",newline)
   code=paste0(code,"        )",newline)
   code=paste0(code,"      )",newline)
   code=paste0(code,"    )",newline)
@@ -119,6 +125,8 @@ ui_generate= function(vars, pars) {
 ################################################################################
 # Create and execute GUI code
 
-eval(parse(text=ui_generate(vars=get("rodeoApp.vars",envir=globalenv()),
-  pars=get("rodeoApp.pars",envir=globalenv()))))
-
+eval(parse(text=ui_generate(
+  vars=get("rodeoApp.vars",envir=globalenv()),
+  pars=get("rodeoApp.pars",envir=globalenv())
+)))
+  

@@ -4,7 +4,7 @@
 \alias{simul}
 \title{Run a simulation}
 \usage{
-simul(model, vars, pars, times, dllfile)
+simul(model, vars, pars, times, dllfile, rtol, atol)
 }
 \arguments{
 \item{model}{Object of class \code{rodeo} representing the model.}
@@ -16,6 +16,12 @@ simul(model, vars, pars, times, dllfile)
 \item{times}{Vector of times for which the states are computed.}
 
 \item{dllfile}{Shared library file holding the compiled model.}
+
+\item{rtol}{Vector of the same length as \code{vars} specifying the
+relative tolerance for the solver (see help of \code{deSolve::lsoda}).}
+
+\item{atol}{Vector of the same length as \code{vars} specifying the
+  absolute tolerance for the solver (see help of \code{deSolve::lsoda}).}
 }
 \value{
 The object returned by \code{deSolve::ode}.

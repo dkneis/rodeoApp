@@ -2,14 +2,14 @@
 # Get info on parameters and variables
 
 par= get("rodeoApp.pars",envir=globalenv())
-required= c("name","label","default","user")
+required= c("name","label","default","user", "html")
 if (!all(required %in% names(par)))
   stop(paste0("incomplete table of parameters; the required columns are: '",
     paste(required,collapse="', '"),"'"))
 par= par[,required]
 
 var= get("rodeoApp.vars",envir=globalenv())
-required= c("name","label","default")
+required= c("name","label","default", "html", "mult", "show", "rtol", "atol")
 if (!all(required %in% names(var)))
   stop(paste0("incomplete table of variables; the required columns are: '",
     paste(required,collapse="', '"),"'"))
@@ -32,7 +32,9 @@ shinyServer(function(input, output) {
         currentPar$value[i]= input[[names(input)[pos]]]
       }
     }
-    currentVar= data.frame(name=var$name, value=var$default, mult=1, draw=FALSE,
+    currentVar= data.frame(name=var$name, value=var$default,
+      mult=var$mult,
+      show=as.logical(var$show),
       stringsAsFactors=FALSE)
     for (i in 1:nrow(currentVar)) {
       pos= match(currentVar$name[i], names(input))
@@ -43,21 +45,21 @@ shinyServer(function(input, output) {
       if (!is.na(pos)) {
         currentVar$mult[i]= input[[names(input)[pos]]]
       }
-      pos= match(paste0(currentVar$name[i],".draw"), names(input))
+      pos= match(paste0(currentVar$name[i],".show"), names(input))
       if (!is.na(pos)) {
-        currentVar$draw[i]= input[[names(input)[pos]]]
+        currentVar$show[i]= input[[names(input)[pos]]]
       }
     }
     return(list(
       par=setNames(as.numeric(currentPar$value), currentPar$name),
       var=setNames(as.numeric(currentVar$value), currentVar$name),
       mult=setNames(as.numeric(currentVar$mult), currentVar$name),
-      draw=setNames(as.logical(currentVar$draw), currentVar$name)
+      show=setNames(as.logical(currentVar$show), currentVar$name)
     ))
   })
 
-  output$plotStoi <- renderPlot({
-    plotStoi(model=get("rodeoApp.model",envir=globalenv()),
+  output$visStoi <- renderText({
+  visStoi(model=get("rodeoApp.model",envir=globalenv()),
       vars=userData()$var, pars=userData()$par,
       funsR=get("rodeoApp.funsR",envir=globalenv()))
   })
@@ -67,9 +69,10 @@ shinyServer(function(input, output) {
       by=as.numeric(input$time.dt))
     out= simul(model=get("rodeoApp.model",envir=globalenv()),
       vars=userData()$var, pars= userData()$par,
-      times=t, dllfile=get("rodeoApp.dllfile",envir=globalenv()))
+      times=t, dllfile=get("rodeoApp.dllfile",envir=globalenv()),
+      rtol=setNames(var$rtol, var$name), atol=setNames(var$atol, var$name))
     plotStates(out, out_ref, model=get("rodeoApp.model",envir=globalenv()),
-      mult=userData()$mult, draw=userData()$draw,
+      mult=userData()$mult, show=userData()$show,
       yrange=as.numeric(c(input$y.min,input$y.max)), logY=input$logY,
       showOld=input$showRef)
     if (input$setRef > setRefCounter) {
