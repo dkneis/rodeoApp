@@ -8,7 +8,7 @@ Maintainer: David Kneis <david.kneis@tu-dresden.de>
 Description: Provides simple interfaces to rodeo-based models.
 License: GPL (>= 2)
 Depends: rodeo
-Imports: devtools, deSolve, shiny, lhs, XLConnect
+Imports: devtools, deSolve, shiny, lhs, readxl
 Suggests: knitr
 VignetteBuilder: knitr
 

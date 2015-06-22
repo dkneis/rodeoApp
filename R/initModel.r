@@ -70,14 +70,10 @@ initModel= function(
     xlFile= paste(dir,xlFile,sep="/")
     if (!file.exists(xlFile))
       stop("file with model definition not found ('",xlFile,"')")
-    tryCatch({
-      wBook= XLConnect::loadWorkbook(xlFile)
-    }, error= function(e) {
-      stop(paste0("failed to import workbook from file '",xlFile,"'; details: ",e))
-    })
     for (i in 1:length(tables)) {
       tryCatch({
-        tmp= XLConnect::readWorksheet(object=wBook, sheet=tables[i])
+        tmp= read_excel(path=xlFile, sheet=tables[i], col_names= TRUE,
+          col_types=NULL, na="", skip=0)
          # drop empty rows
         tmp= subset(tmp, apply(tmp, 1, function(x) {!all(is.na(x))}))
       }, error= function(e) {
@@ -87,6 +83,7 @@ initModel= function(
       tbl[[i]]= tmp
       names(tbl)[i]= tables[i]
     }
+
   # Read tables from tabular text files
   } else {
     for (i in 1:length(tables)) {

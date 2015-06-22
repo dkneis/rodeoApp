@@ -26,11 +26,11 @@ if (!("deSolve" %in% installed.packages()[,1]))
   install.packages("deSolve")
 library("deSolve")
 
-# Package for reading Xl files
-#' @import XLConnect
-if (!("XLConnect" %in% installed.packages()[,1]))
-  install.packages("XLConnect")
-library("XLConnect")
+# Package for reading XL files
+#' @import readxl
+if (!("readxl" %in% installed.packages()[,1]))
+  install.packages("readxl")
+library("readxl")
 
 # Package for latin hypercube sampling
 #' @import lhs
