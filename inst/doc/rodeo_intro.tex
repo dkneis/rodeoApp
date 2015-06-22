@@ -186,12 +186,18 @@ The sole declaration of a function is not sufficient to make it callable from wi
  \item If the function is only intrinsic to only one/some of the target languages (see Sec.~\ref{sec:targetLanguages}), a wrapper function must be declared under a different name and a definition must be supplied as well. The definition should make use of the intrinsic function(s) where applicable.
 \end{itemize}
 
-And finally:
+When using R as the target language, function definitions must be in the R 
+language. When using another target language, functions needing a definition 
+must be implemented in both the particular target language and R\footnote{The 
+R-implementation is required to compute stoichiometry factors outside the 
+ODE-solver.}.
 
-\begin{itemize}
- \item When using R as the target language, function definitions must be in the R language.
- \item When using another target language, functions needing a definition must be implemented in both R and the particular target language.
-\end{itemize}
+\emph{Important:} Although the functions \texttt{min} and \texttt{max} are 
+intrinsic to both R and Fortran, they behave differently for vector arguments. 
+If \rodeo{} is used to generate R-code, one must generally use the functions 
+\texttt{pmin} and \texttt{pmax} instead of the 3-letter variants. Only the 
+latter functions work properly in the case of spatially distributed 
+models (multi-box models).
 
 In cases where no functions appear in mathematical expressions at all, it is usually appropriate to provide an empty table (or a dummy table) with the column names listed in Table~\ref{tab:funs}.
 
