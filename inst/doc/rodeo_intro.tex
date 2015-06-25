@@ -192,14 +192,40 @@ must be implemented in both the particular target language and R\footnote{The
 R-implementation is required to compute stoichiometry factors outside the 
 ODE-solver.}.
 
-\emph{Important:} Although the functions \texttt{min} and \texttt{max} are 
-intrinsic to both R and Fortran, they behave differently for vector arguments. 
-If \rodeo{} is used to generate R-code, one must generally use the functions 
-\texttt{pmin} and \texttt{pmax} instead of the 3-letter variants. Only the 
-latter functions work properly in the case of spatially distributed 
-models (multi-box models).
+In cases where no functions appear in mathematical expressions at all, it is 
+usually appropriate to provide an empty table (or a dummy table) with the column 
+names listed in Table~\ref{tab:funs}.
 
-In cases where no functions appear in mathematical expressions at all, it is usually appropriate to provide an empty table (or a dummy table) with the column names listed in Table~\ref{tab:funs}.
+\emph{Important:} Although the functions \texttt{min} and \texttt{max} are 
+intrinsic to both R and Fortran, they behave differently in the two 
+languages when fed with vector arguments (e.~g. in spatially distributed 
+models). If \rodeo{} is used to generate R-code, one must generally use the 
+functions \texttt{pmin} and \texttt{pmax} instead of the 3-letter variants. Only 
+the latter functions work properly in the case of spatially distributed models 
+(multi-box models). In order to write mathematical
+expressions is a language-independent manner, it is recommended to define the 
+following wrapper functions in R
+
+\begin{verbatim}
+minimum = function (x,y) { pmin(x,y) }
+maximum = function (x,y) { pmax(x,y) }
+\end{verbatim}
+
+and Fortran
+
+\begin{verbatim}
+double precision function minimum (x,y)
+double precision, intent(in):: x, y
+minimum= min(x,y)
+end function
+
+double precision function maximum (x,y)
+double precision, intent(in):: x, y
+maximum= max(x,y)
+end function
+\end{verbatim}
+
+respectively.
 
 \subsubsection{Declaration of process rates} \label{sec:input:tables:processes}
 
