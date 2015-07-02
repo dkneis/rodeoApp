@@ -57,7 +57,12 @@ plotStates= function(out, out_old, model, mult, show, yrange, logY, showOld) {
   clrHelp= colorRamp(c("violetred4","orangered2","indianred",
     "darkseagreen","dodgerblue3","blue4"), space="rgb")
   clr= function(i) {
-    rgb(clrHelp((i-1)/(model$lenVars()-1)), maxColorValue=255)
+    if ("color" %in% names(model$getVars())) {
+      res= model$getVars()[i,"color"]
+    } else {
+      res= rgb(clrHelp((i-1)/(model$lenVars()-1)), maxColorValue=255)
+    }
+    return(res)
   }
   times= out[,1]
   layout(matrix(1:2,ncol=2),widths=c(8,2))
@@ -65,7 +70,7 @@ plotStates= function(out, out_old, model, mult, show, yrange, logY, showOld) {
     xlab="Time", ylab="State variable(s)")
   usr= par("usr")
   rect(xleft=usr[1], xright=usr[2], ybottom=ifelse(logY,10^usr[3],usr[3]),
-    ytop=ifelse(logY,10^usr[4],usr[4]), col="lightgrey")
+    ytop=ifelse(logY,10^usr[4],usr[4]), col="grey85")
   # Previous output
   if ((!is.null(out_old)) && showOld) {
     times_old= out_old[,1]
