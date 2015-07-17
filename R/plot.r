@@ -25,7 +25,7 @@ visStoi= function(model, vars, pars, funsR) {
   html= exportDF(x=tbl, tex=FALSE,
     colnames= setNames(c("Process",model$getVars()$html[match(colnames(m),
       model$getVars()$name)]), names(tbl)),
-    align= c(process="right",setNames(rep("center",ncol(m)), colnames(m))),
+    align= c(process="left",setNames(rep("center",ncol(m)), colnames(m))),
     funCell= setNames(replicate(ncol(m),signsymbol), colnames(m))
   )
   #tf= tempfile()
@@ -65,7 +65,9 @@ plotStates= function(out, out_old, model, mult, show, yrange, logY, showOld) {
     return(res)
   }
   times= out[,1]
-  layout(matrix(1:2,ncol=2),widths=c(8,2))
+  layout(matrix(1:2,ncol=2),widths=c(5,1))
+  opar=par(c("mar", "cex"))
+  par(mar=c(6,6,0.5,0.5), cex=1.25)
   plot(range(times), yrange, type="n", log=ifelse(logY,"y",""),
     xlab="Time", ylab="State variable(s)")
   usr= par("usr")
@@ -88,16 +90,18 @@ plotStates= function(out, out_old, model, mult, show, yrange, logY, showOld) {
       lines(times, out[,1+i]*mult[varname], lty=i, lwd=2, col=clr(i)) 
     }
   }
+  par(mar=opar$mar, cex=opar$cex)
+
   # Legend
-  omar=par("mar")
-  par(mar=rep(0.1,4))
+  opar=par(c("mar", "cex"))
+  par(mar=rep(0.1,4), cex=1.25)
   plot(0,0,bty="n",type="n",xaxt="n",yaxt="n",xlab="",ylab="")
   inds= which(model$namesVars() %in% names(show)[show])
   legend("left",
     bty="n", seg.len=1.5,
     lty=inds, lwd=2, col=clr(inds),
     legend=model$namesVars()[inds])
-  par(mar=omar)
+  par(mar=opar$mar, cex=opar$cex)
   layout(matrix(1,ncol=1))
 }
 
