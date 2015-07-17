@@ -9,7 +9,7 @@ if (!all(required %in% names(par)))
 par= par[,required]
 
 var= get("rodeoApp.vars",envir=globalenv())
-required= c("name","label","default", "html", "mult", "show", "rtol", "atol")
+required= c("name","label","default", "html", "tex", "mult", "show", "rtol", "atol")
 if (!all(required %in% names(var)))
   stop(paste0("incomplete table of variables; the required columns are: '",
     paste(required,collapse="', '"),"'"))
