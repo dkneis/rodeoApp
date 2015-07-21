@@ -6,7 +6,7 @@
 \usage{
 initModel(dir = "", xlFile = "model.xlsx", funsR = "functions.r",
   funsF = "functions.f95", tables = c(vars = "vars", pars = "pars", funs =
-  "funs", pros = "pros", stoi = "stoi"), colsep = ";")
+  "funs", pros = "pros", stoi = "stoi"), colsep = ",")
 }
 \arguments{
 \item{dir}{Directory where input files are located. This value is added as a

@@ -48,13 +48,16 @@ visStoi= function(model, vars, pars, funsR) {
 #' @param yrange Range of the y-axis.
 #' @param logY Logical to switch between linear and log axis.
 #' @param showOld Logical. Enables/disables plotting of data in \code{out_old}.
+#' @param obs \code{NULL} or a data frame with observations (numeric time info
+#'   is expected in the first column).
 #'
 #' @return \code{NULL}.
 #'
 #' @author David Kneis \email{david.kneis@@tu-dresden.de}
 #'
 #' @export
-plotStates= function(out, out_old, model, mult, show, trange, yrange, logY, showOld) {
+plotStates= function(out, out_old, model, mult, show, trange, yrange, logY,
+  showOld, obs) {
   clrHelp= colorRamp(c("violetred4","orangered2","indianred",
     "darkseagreen","dodgerblue3","blue4"), space="rgb")
   clr= function(i) {
@@ -73,14 +76,14 @@ plotStates= function(out, out_old, model, mult, show, trange, yrange, logY, show
     xlab="Time", ylab="State variable(s)")
   usr= par("usr")
   rect(xleft=usr[1], xright=usr[2], ybottom=ifelse(logY,10^usr[3],usr[3]),
-    ytop=ifelse(logY,10^usr[4],usr[4]), col="grey85")
+    ytop=ifelse(logY,10^usr[4],usr[4]), col="grey90")
   # Previous output
   if ((!is.null(out_old)) && showOld) {
     times_old= out_old[,1]
     for (i in 1:model$lenVars()) {
       varname= model$namesVars()[i]
       if (show[varname]) {
-        lines(times_old, out_old[,1+i]*mult[varname], lty=i, lwd=2, col="white") 
+        lines(times_old, out_old[,1+i]*mult[varname], lty=i, lwd=2, col="white")
       }
     }
   }
@@ -88,7 +91,10 @@ plotStates= function(out, out_old, model, mult, show, trange, yrange, logY, show
   for (i in 1:model$lenVars()) {
     varname= model$namesVars()[i]
     if (show[varname]) {
-      lines(times, out[,1+i]*mult[varname], lty=i, lwd=2, col=clr(i)) 
+      lines(times, out[,1+i]*mult[varname], lty=i, lwd=2, col=clr(i))
+      if ((!is.null(obs)) && (varname %in% names(obs))) {
+        points(obs[,1], obs[,varname], pch=i, col=clr(i))
+      }
     }
   }
   par(mar=opar$mar, cex=opar$cex)

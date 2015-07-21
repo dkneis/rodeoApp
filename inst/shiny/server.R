@@ -19,11 +19,14 @@ var= var[,required]
 out_ref= NULL
 setRefCounter= 0
 
+saveSettingsCounter= 0
+
 ################################################################################
 
 # Define server
 shinyServer(function(input, output) {
 
+  # Set parameters and variables
   userData= reactive({
     currentPar= data.frame(name=par$name, value=par$default, stringsAsFactors=FALSE)
     for (i in 1:nrow(currentPar)) {
@@ -58,14 +61,16 @@ shinyServer(function(input, output) {
     ))
   })
 
+  # Plot stoichiometry matrix
   output$visStoi <- renderText({
   visStoi(model=get("rodeoApp.model",envir=globalenv()),
       vars=userData()$var, pars=userData()$par,
       funsR=get("rodeoApp.funsR",envir=globalenv()))
   })
 
+  # Simulate and plot state variables
   output$plotStates <- renderPlot({
-    t= seq(from=as.numeric(input$time.min), to=as.numeric(input$time.max),
+    t= seq(from=as.numeric(input$time.start), to=as.numeric(input$time.end),
       by=as.numeric(input$time.dt))
     out= simul(model=get("rodeoApp.model",envir=globalenv()),
       vars=userData()$var, pars= userData()$par,
@@ -76,10 +81,30 @@ shinyServer(function(input, output) {
       trange=as.numeric(c(input$taxis.min,input$taxis.max)),
       yrange=as.numeric(c(input$yaxis.min,input$yaxis.max)),
       logY=input$yaxis.log,
-      showOld=input$showRef)
+      showOld=input$showRef,
+      obs=get("rodeoApp.obs",envir=globalenv()))
     if (input$setRef > setRefCounter) {
       out_ref <<- out
       setRefCounter <<- input$setRef 
+    }
+  })
+
+  # Save settings on request
+  observe({
+    if (input$saveSettings > saveSettingsCounter) {
+      sets= c(
+        time.start=input$time.start,
+        time.end=input$time.end,
+        time.dt=input$time.dt,
+        taxis.min=input$taxis.min,
+        taxis.max=input$taxis.max,
+        yaxis.min=input$yaxis.min,
+        yaxis.max=input$yaxis.max,
+        yaxis.log=input$yaxis.log
+      )
+      write(x=paste(names(sets),sets,sep="=",collapse="\n"),
+        file=get("rodeoApp.fileSettings",envir=globalenv()))
+      saveSettingsCounter <<- input$saveSettings
     }
   })
 

@@ -6,7 +6,7 @@
 \usage{
 runGUI(dir = "", xlFile = "model.xlsx", funsR = "functions.r",
   funsF = "functions.f95", tables = c(vars = "vars", pars = "pars", funs =
-  "funs", pros = "pros", stoi = "stoi"), colsep = ";")
+  "funs", pros = "pros", stoi = "stoi"), colsep = ",", obs = NULL)
 }
 \arguments{
 \item{dir}{Directory where input files are located. This value is added as a
@@ -33,6 +33,11 @@ information.}
 
 \item{colsep}{Specifies the column separator in text files. Only used if
   \code{xlFile} is \code{NULL}.}
+
+\item{obs}{If not \code{NULL}, this must be a data frame with observed values
+  of the state variables. Time information (numeric) is expected in the first
+  column. Columns with observation data (if existing) must be named like the
+  simulated state variables. Missing values must be marked as \code{NA}.}
 }
 \value{
 \code{NULL}

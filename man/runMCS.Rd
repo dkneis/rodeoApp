@@ -7,7 +7,7 @@
 runMCS(outdir, times, nruns, nsig = 4, overwrite = FALSE, dir = "",
   xlFile = "model.xlsx", funsR = "functions.r", funsF = "functions.f95",
   tables = c(vars = "vars", pars = "pars", funs = "funs", pros = "pros", stoi
-  = "stoi"), colsep = ";", silent = FALSE)
+  = "stoi"), colsep = ",", silent = FALSE)
 }
 \arguments{
 \item{outdir}{Output directory. Should be empty unless \code{overwrite} is \code{TRUE}.}

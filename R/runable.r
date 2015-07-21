@@ -4,6 +4,10 @@
 #' and/or initial values.
 #'
 #' @inheritParams initModel
+#' @param obs If not \code{NULL}, this must be a data frame with observed values
+#'   of the state variables. Time information (numeric) is expected in the first
+#'   column. Columns with observation data (if existing) must be named like the
+#'   simulated state variables. Missing values must be marked as \code{NA}.
 #'
 #' @return \code{NULL}
 #'
@@ -23,7 +27,7 @@
 runGUI= function(
   dir="", xlFile="model.xlsx", funsR="functions.r", funsF="functions.f95",
   tables= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi"),
-  colsep=","
+  colsep=",", obs=NULL
 ) {
   # Run init
   ini= initModel(dir=dir, xlFile=xlFile, funsR=funsR, funsF=funsF,
@@ -34,6 +38,12 @@ runGUI= function(
   assign(x="rodeoApp.funsR", value=ini$funsR, envir=globalenv())
   assign(x="rodeoApp.vars", value=ini$vars, envir=globalenv())
   assign(x="rodeoApp.pars", value=ini$pars, envir=globalenv())
+  assign(x="rodeoApp.obs", value=obs, envir=globalenv())
+
+  # To save preferences file
+  fileSettings= paste0(dir,"/rodeoApp.savedSettings")
+  assign(x="rodeoApp.fileSettings", value=fileSettings, envir=globalenv())
+
   # Start shiny app
   shiny::runApp(system.file("shiny", package="rodeoApp"))
   return(invisible(NULL))

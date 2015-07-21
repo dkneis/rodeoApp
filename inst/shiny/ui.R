@@ -7,6 +7,34 @@ ui_generate= function(vars, pars) {
   headStyle= "font-weight: bold; color: #3E566A"
   newline="\n"
 
+  # Settings
+  if (file.exists(get("rodeoApp.fileSettings",envir=globalenv()))) {
+    tempenv= new.env()
+    sys.source(file=get("rodeoApp.fileSettings",envir=globalenv()), envir=tempenv)
+    sett= list(
+      time.start= get("time.start",tempenv),
+      time.end=   get("time.end",tempenv),
+      time.dt=    get("time.dt",tempenv),
+      taxis.min=  get("taxis.min",tempenv),
+      taxis.max=  get("taxis.max",tempenv),
+      yaxis.min=  get("yaxis.min",tempenv),
+      yaxis.max=  get("yaxis.max",tempenv),
+      yaxis.log=  get("yaxis.log",tempenv)
+    )
+    rm(tempenv)
+  } else {
+    sett= list(
+      time.start=0,
+      time.end=10,
+      time.dt=1,
+      taxis.min=0,
+      taxis.max=10,
+      yaxis.min= min(vars$default)*ifelse(min(vars$default) < 0,2,0.5),
+      yaxis.max= max(vars$default)*ifelse(max(vars$default) < 0,0.5,2),
+      yaxis.log=FALSE
+    )
+  }
+
   # Dynamic code: Text boxes for parameters
   inputPars= function() {
     code=""
@@ -71,7 +99,10 @@ ui_generate= function(vars, pars) {
                 p(style='",headStyle,"', 'On')
               )
             )
-          )
+          ),
+          column(2, p('')),
+          column(2, div(style='",labStyle,"',actionButton('setRef', label='Set as reference'))),
+          column(2, div(style='",labStyle,"',checkboxInput('showRef', label='Show reference', value = FALSE)))
         ),
         fluidRow(
           column(2,style = 'overflow-y:scroll; max-height: 800px',
@@ -89,7 +120,7 @@ ui_generate= function(vars, pars) {
           column(8,
             fluidRow(
               column(12,
-                plotOutput(outputId='plotStates', height='800px', width='90%')
+                plotOutput(outputId='plotStates', height='600px', width='90%')
               )
             )
           )
@@ -108,28 +139,26 @@ ui_generate= function(vars, pars) {
       # New tab panel
       tabPanel('General settings',
         fluidRow(
+          column(2, div(style='",labStyle,"',actionButton('saveSettings', label='Save settings'))),
+          column(10, p('",paste0('Target file: ',get('rodeoApp.fileSettings',envir=globalenv())),"'))
+        ),
+        tags$hr(),
+        fluidRow(
           column(2, p(style='",headStyle,"', 'Simulation time')),
-          column(1, div(style='",labStyle,"',textInput('time.min', label = 'min. time', value=0))),
-          column(1, div(style='",labStyle,"',textInput('time.max', label = 'max. time', value=10))),
-          column(1, div(style='",labStyle,"',textInput('time.dt', label = 'time step', value=1)))
+          column(1, div(style='",labStyle,"',textInput('time.start', label = 'start', value=",sett$time.start,"))),
+          column(1, div(style='",labStyle,"',textInput('time.end', label = 'end', value=",sett$time.end,"))),
+          column(1, div(style='",labStyle,"',textInput('time.dt', label = 'step', value=",sett$time.dt,")))
         ),
         fluidRow(
           column(2, p(style='",headStyle,"', 'Time axis limits')),
-          column(1, div(style='",labStyle,"',textInput('taxis.min', label = 'min.', value=0))),
-          column(1, div(style='",labStyle,"',textInput('taxis.max', label = 'max.', value=10)))
+          column(1, div(style='",labStyle,"',textInput('taxis.min', label = 'min.', value=",sett$taxis.min,"))),
+          column(1, div(style='",labStyle,"',textInput('taxis.max', label = 'max.', value=",sett$taxis.max,")))
         ),
         fluidRow(
           column(2, p(style='",headStyle,"', 'Y axis limits')),
-          column(1, div(style='",labStyle,"',textInput('yaxis.min', label = 'min.',
-            value=",min(vars$default)*ifelse(min(vars$default) < 0,2,0.5),"))),
-          column(1, div(style='",labStyle,"',textInput('yaxis.max', label = 'max.',
-            value=",max(vars$default)*ifelse(max(vars$default) < 0,0.5,2),"))),
-          column(1, div(style='",labStyle,"',checkboxInput('yaxis.log', label='Log scale', value = FALSE)))
-        ),
-        fluidRow(
-          column(2, p(style='",headStyle,"', 'Reference run')),
-          column(1, div(style='",labStyle,"',actionButton('setRef', label='Set as ref.'))),
-          column(1, div(style='",labStyle,"',checkboxInput('showRef', label='Show ref.', value = FALSE)))
+          column(1, div(style='",labStyle,"',textInput('yaxis.min', label = 'min.', value=",sett$yaxis.min,"))),
+          column(1, div(style='",labStyle,"',textInput('yaxis.max', label = 'max.', value=",sett$yaxis.max,"))),
+          column(1, div(style='",labStyle,"',checkboxInput('yaxis.log', label='Log scale', value=",sett$yaxis.log,")))
         )
       ) # End tabPanel
 
@@ -149,8 +178,6 @@ ui_generate= function(vars, pars) {
 #write(x=code, file=gsub(pattern="\\",replacement="/",x=f,fixed=TRUE))
 #cat("written to",f,"\n")
 
-
-# Alternative comment
 ################################################################################
 # Create and execute GUI code
 

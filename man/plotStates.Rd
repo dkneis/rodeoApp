@@ -4,7 +4,7 @@
 \alias{plotStates}
 \title{Plot state variables}
 \usage{
-plotStates(out, out_old, model, mult, show, trange, yrange, logY, showOld)
+plotStates(out, out_old, model, mult, show, trange, yrange, logY, showOld, obs)
 }
 \arguments{
 \item{out}{Object returned from latest call to \code{simul}.}
@@ -24,6 +24,9 @@ plotStates(out, out_old, model, mult, show, trange, yrange, logY, showOld)
 \item{logY}{Logical to switch between linear and log axis.}
 
 \item{showOld}{Logical. Enables/disables plotting of data in \code{out_old}.}
+
+\item{obs}{\code{NULL} or a data frame with observations (numeric time info
+  is expected in the first column).}
 }
 \value{
 \code{NULL}.

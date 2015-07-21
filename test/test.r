@@ -18,6 +18,9 @@ library("rodeoApp")
 
 #runGUI(dir="/home/dkneis/Dropbox/HS-Study-Project/intermediate_Model/#Model_table_external")
 
+#obs= data.frame(1:5, T=seq(1, 1e9, length.out=5))
+#runGUI(dir=system.file("examples/DRT", package="rodeoApp"), obs=obs)
+
 runGUI(dir=system.file("examples/DRT", package="rodeoApp"))
 
 #runGUI(dir="/home/dkneis/tudd/dynaTrait/claudia")
