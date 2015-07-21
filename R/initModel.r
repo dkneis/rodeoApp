@@ -48,7 +48,7 @@
 initModel= function(
   dir="", xlFile="model.xlsx", funsR="functions.r", funsF="functions.f95",
   tables= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi"),
-  colsep=";"
+  colsep=","
 ) {
   # Set/check file names
   funsR= paste(dir,funsR,sep="/")
