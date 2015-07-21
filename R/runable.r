@@ -23,7 +23,7 @@
 runGUI= function(
   dir="", xlFile="model.xlsx", funsR="functions.r", funsF="functions.f95",
   tables= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi"),
-  colsep=";"
+  colsep=","
 ) {
   # Run init
   ini= initModel(dir=dir, xlFile=xlFile, funsR=funsR, funsF=funsF,
@@ -89,7 +89,7 @@ runMCS= function(
   overwrite=FALSE,
   dir="", xlFile="model.xlsx", funsR="functions.r", funsF="functions.f95",
   tables= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi"),
-  colsep=";",
+  colsep=",",
   silent=FALSE
 ) {
   # Initialize model
