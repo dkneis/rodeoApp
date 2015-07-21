@@ -4,7 +4,7 @@
 \alias{plotStates}
 \title{Plot state variables}
 \usage{
-plotStates(out, out_old, model, mult, show, yrange, logY, showOld)
+plotStates(out, out_old, model, mult, show, trange, yrange, logY, showOld)
 }
 \arguments{
 \item{out}{Object returned from latest call to \code{simul}.}
@@ -16,6 +16,8 @@ plotStates(out, out_old, model, mult, show, yrange, logY, showOld)
 \item{mult}{Named vector with multipliers to apply to variables before plotting.}
 
 \item{show}{Named logical vector to enable plotting of individual variables.}
+
+\item{trange}{Range of the x-axis (time axis).}
 
 \item{yrange}{Range of the y-axis.}
 

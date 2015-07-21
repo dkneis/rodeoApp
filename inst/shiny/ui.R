@@ -89,39 +89,7 @@ ui_generate= function(vars, pars) {
           column(8,
             fluidRow(
               column(12,
-                plotOutput(outputId='plotStates', height='600px', width='90%')
-              )
-            ),
-            fluidRow(
-              column(2,
-                div(style='",labStyle,"',textInput('time.min', label = 'min. time', value=0))
-              ),
-              column(2,
-                div(style='",labStyle,"',textInput('time.max', label = 'max. time', value=10))
-              ),
-              column(2,
-                div(style='",labStyle,"',textInput('time.dt', label = 'time step', value=1))
-              )
-            ),
-            fluidRow(
-              column(2,
-                div(style='",labStyle,"',textInput('y.min', label = 'min. Y',
-                  value=",min(vars$default)*ifelse(min(vars$default) < 0,2,0.5),"))
-              ),
-              column(2,
-                div(style='",labStyle,"',textInput('y.max', label = 'max. Y',
-                   value=",max(vars$default)*ifelse(max(vars$default) < 0,0.5,2),"))
-              ),
-              column(2,
-                div(style='",labStyle,"',checkboxInput('logY', label='Log Y', value = FALSE))
-              )
-            ),
-            fluidRow(
-              column(2,
-                div(style='",labStyle,"',actionButton('setRef', label='Set as ref.'))
-              ),
-              column(2,
-                div(style='",labStyle,"',checkboxInput('showRef', label='Show ref.', value = FALSE))
+                plotOutput(outputId='plotStates', height='800px', width='90%')
               )
             )
           )
@@ -135,7 +103,34 @@ ui_generate= function(vars, pars) {
             htmlOutput(outputId='visStoi', inline=FALSE)
           )
         )
+      ), # End tabPanel
 
+      # New tab panel
+      tabPanel('General settings',
+        fluidRow(
+          column(2, p(style='",headStyle,"', 'Simulation time')),
+          column(1, div(style='",labStyle,"',textInput('time.min', label = 'min. time', value=0))),
+          column(1, div(style='",labStyle,"',textInput('time.max', label = 'max. time', value=10))),
+          column(1, div(style='",labStyle,"',textInput('time.dt', label = 'time step', value=1)))
+        ),
+        fluidRow(
+          column(2, p(style='",headStyle,"', 'Time axis limits')),
+          column(1, div(style='",labStyle,"',textInput('taxis.min', label = 'min.', value=0))),
+          column(1, div(style='",labStyle,"',textInput('taxis.max', label = 'max.', value=10)))
+        ),
+        fluidRow(
+          column(2, p(style='",headStyle,"', 'Y axis limits')),
+          column(1, div(style='",labStyle,"',textInput('yaxis.min', label = 'min.',
+            value=",min(vars$default)*ifelse(min(vars$default) < 0,2,0.5),"))),
+          column(1, div(style='",labStyle,"',textInput('yaxis.max', label = 'max.',
+            value=",max(vars$default)*ifelse(max(vars$default) < 0,0.5,2),"))),
+          column(1, div(style='",labStyle,"',checkboxInput('yaxis.log', label='Log scale', value = FALSE)))
+        ),
+        fluidRow(
+          column(2, p(style='",headStyle,"', 'Reference run')),
+          column(1, div(style='",labStyle,"',actionButton('setRef', label='Set as ref.'))),
+          column(1, div(style='",labStyle,"',checkboxInput('showRef', label='Show ref.', value = FALSE)))
+        )
       ) # End tabPanel
 
     ) # End Navbar page

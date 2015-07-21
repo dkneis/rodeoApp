@@ -73,7 +73,9 @@ shinyServer(function(input, output) {
       rtol=setNames(var$rtol, var$name), atol=setNames(var$atol, var$name))
     plotStates(out, out_ref, model=get("rodeoApp.model",envir=globalenv()),
       mult=userData()$mult, show=userData()$show,
-      yrange=as.numeric(c(input$y.min,input$y.max)), logY=input$logY,
+      trange=as.numeric(c(input$taxis.min,input$taxis.max)),
+      yrange=as.numeric(c(input$yaxis.min,input$yaxis.max)),
+      logY=input$yaxis.log,
       showOld=input$showRef)
     if (input$setRef > setRefCounter) {
       out_ref <<- out
