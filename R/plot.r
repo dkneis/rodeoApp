@@ -93,7 +93,7 @@ plotStates= function(out, out_old, model, mult, show, trange, yrange, logY,
     if (show[varname]) {
       lines(times, out[,1+i]*mult[varname], lty=i, lwd=2, col=clr(i))
       if ((!is.null(obs)) && (varname %in% names(obs))) {
-        points(obs[,1], obs[,varname], pch=i, col=clr(i))
+        points(obs[,1], obs[,varname]*mult[varname], pch=i, col=clr(i))
       }
     }
   }
