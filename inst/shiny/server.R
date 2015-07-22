@@ -83,8 +83,6 @@ shinyServer(function(input, output) {
         rtol=setNames(var$rtol, var$name), atol=setNames(var$atol, var$name))
       v[names_steady]= out$y[names_steady]
     }
-print(out)
-print(v)
 
     # Dynamic simulation
     t= seq(from=as.numeric(input$time.start), to=as.numeric(input$time.end),
