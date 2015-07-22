@@ -41,9 +41,20 @@ ui_generate= function(vars, pars) {
     rows= which(as.logical(pars$user))
     if (length(rows) > 0) {
       for (i in rows) {
-        code=paste0(code,"      div(style='",labStyle,"',textInput('",pars$name[i],"', label = '",
-          pars$label[i],"', value=",pars$default[i],"))",
-          ifelse(i==rows[length(rows)],"",","),newline)
+        # Begin param name
+        code=paste0(code,"        fluidRow(",newline)
+        code=paste0(code,"          column(12,",newline)
+        code=paste0(code,"            div(style='",labStyle,"', '",pars$label[i],"')",newline)
+        code=paste0(code,"          )",newline)
+        code=paste0(code,"        ),",newline)
+        # End param name
+        code=paste0(code,"        fluidRow(",newline)
+        code=paste0(code,"          column(12,",newline)
+        code=paste0(code,"            div(style='",labStyle,
+          "',textInput('",pars$name[i],
+          "', label = '', value=",pars$default[i],"))",newline)
+        code=paste0(code,"          )",newline)
+        code=paste0(code,"        )",ifelse(i==length(rows),"",","),newline)
       }
     } else {
       code=paste0(code,"p('No visible items')",newline)
@@ -55,10 +66,19 @@ ui_generate= function(vars, pars) {
   inputVars= function() {
     code=""
     for (i in 1:nrow(vars)) {
+      # Begin variable name
+      code=paste0(code,"        fluidRow(",newline)
+      code=paste0(code,"          column(12,",newline)
+      code=paste0(code,"            div(style='",labStyle,
+        "', '",paste0(vars$label[i],ifelse(as.logical(vars$steady[i]),' (SS)','')),"')",newline)
+      code=paste0(code,"          )",newline)
+      code=paste0(code,"        ),",newline)
+      # End variable name
       code=paste0(code,"        fluidRow(",newline)
       code=paste0(code,"          column(5,",newline)
-      code=paste0(code,"            div(style='",labStyle,"',textInput('",vars$name[i],
-        "', label = '",vars$label[i],"', value=",vars$default[i],"))",newline)
+      code=paste0(code,"            div(style='",labStyle,
+        "',textInput('",vars$name[i],
+        "', label = '', value=",vars$default[i],"))",newline)
       code=paste0(code,"          ),",newline)
       code=paste0(code,"          column(4,",newline)
       code=paste0(code,"            div(style='",labStyle,"',textInput('",vars$name[i],

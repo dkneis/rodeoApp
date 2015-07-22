@@ -20,11 +20,17 @@ if (!("shiny" %in% installed.packages()[,1]))
   install.packages("shiny")
 library(shiny)
 
-# Package with numerical solvers
+# Package with ODE integrators
 #' @import deSolve
 if (!("deSolve" %in% installed.packages()[,1]))
   install.packages("deSolve")
 library("deSolve")
+
+# Package with steady-state solvers
+#' @import rootSolve
+if (!("rootSolve" %in% installed.packages()[,1]))
+  install.packages("rootSolve")
+library("rootSolve")
 
 # Package for reading XL files
 #' @import readxl

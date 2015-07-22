@@ -9,7 +9,7 @@ if (!all(required %in% names(par)))
 par= par[,required]
 
 var= get("rodeoApp.vars",envir=globalenv())
-required= c("name","label","default", "html", "tex", "mult", "show", "rtol", "atol")
+required= c("name","label","default", "html", "tex", "mult", "show", "rtol", "atol", "steady")
 if (!all(required %in% names(var)))
   stop(paste0("incomplete table of variables; the required columns are: '",
     paste(required,collapse="', '"),"'"))
@@ -70,12 +70,30 @@ shinyServer(function(input, output) {
 
   # Simulate and plot state variables
   output$plotStates <- renderPlot({
+
+    # Store user-supplied initial values for possible further modification
+    v= userData()$var
+
+    # Steady state simulation
+    names_steady= var$name[which(as.logical(var$steady))]
+    if (length(names_steady) > 0) {
+      out= stst(model=get("rodeoApp.model",envir=globalenv()),
+        vars=v, pars= userData()$par,
+        dllfile=get("rodeoApp.dllfile",envir=globalenv()),
+        rtol=setNames(var$rtol, var$name), atol=setNames(var$atol, var$name))
+      v[names_steady]= out$y[names_steady]
+    }
+print(out)
+print(v)
+
+    # Dynamic simulation
     t= seq(from=as.numeric(input$time.start), to=as.numeric(input$time.end),
       by=as.numeric(input$time.dt))
     out= simul(model=get("rodeoApp.model",envir=globalenv()),
-      vars=userData()$var, pars= userData()$par,
+      vars=v, pars= userData()$par,
       times=t, dllfile=get("rodeoApp.dllfile",envir=globalenv()),
       rtol=setNames(var$rtol, var$name), atol=setNames(var$atol, var$name))
+    # Graphics
     plotStates(out, out_ref, model=get("rodeoApp.model",envir=globalenv()),
       mult=userData()$mult, show=userData()$show,
       trange=as.numeric(c(input$taxis.min,input$taxis.max)),
