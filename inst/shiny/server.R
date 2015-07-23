@@ -92,7 +92,8 @@ shinyServer(function(input, output) {
       times=t, dllfile=get("rodeoApp.dllfile",envir=globalenv()),
       rtol=setNames(var$rtol, var$name), atol=setNames(var$atol, var$name))
     # Graphics
-    plotStates(out, out_ref, model=get("rodeoApp.model",envir=globalenv()),
+    plotStates(out, out_ref, input$.time.unit, input$.time.base,
+      model=get("rodeoApp.model",envir=globalenv()),
       mult=userData()$mult, show=userData()$show,
       rangeT=as.numeric(c(input$.taxis.min,input$.taxis.max)),
       rangeY=as.numeric(c(input$.yaxis.min,input$.yaxis.max)),
@@ -113,7 +114,7 @@ shinyServer(function(input, output) {
       nam= names(input)[grepl(pattern="^[.][a-zA-Z._]+", x=names(input))]
       sets= vector("character", length(nam))
       for (i in 1:length(nam)) {  # because single brackets, e.g. input[nam], not allowed
-        sets[i]= input[[nam[i]]]
+        sets[i]= paste0("'",input[[nam[i]]],"'")
         names(sets)[i]= nam[i]
       }
       write(x=paste(names(sets),sets,sep="=",collapse="\n"),

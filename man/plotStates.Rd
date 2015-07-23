@@ -4,13 +4,18 @@
 \alias{plotStates}
 \title{Plot state variables}
 \usage{
-plotStates(out, out_old, model, mult, show, rangeT, rangeY, gridT, gridY, logY,
-  showOld, obs)
+plotStates(out, out_old, timeUnit, timeBase, model, mult, show, rangeT, rangeY,
+  gridT, gridY, logY, showOld, obs)
 }
 \arguments{
 \item{out}{Object returned from latest call to \code{simul}.}
 
 \item{out_old}{Object returned from an earlier call to \code{simul}.}
+
+\item{timeUnit}{Unit of numeric simulation time info (as a string).}
+
+\item{timeBase}{Date and time of the startpoint of the simulation as a
+value of class \code{POSIXct}.}
 
 \item{model}{Object of class \code{rodeo} representing the model.}
 

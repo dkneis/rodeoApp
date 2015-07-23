@@ -15,6 +15,8 @@ ui_generate= function(vars, pars) {
       .time.start= get(".time.start",tempenv),
       .time.end=   get(".time.end",tempenv),
       .time.dt=    get(".time.dt",tempenv),
+      .time.base=  get(".time.base",tempenv),
+      .time.unit=  get(".time.unit",tempenv),
       .taxis.min=  get(".taxis.min",tempenv),
       .taxis.max=  get(".taxis.max",tempenv),
       .taxis.grid= get(".taxis.grid",tempenv),
@@ -29,6 +31,8 @@ ui_generate= function(vars, pars) {
       .time.start=0,
       .time.end=10,
       .time.dt=1,
+      .time.base="1970-01-01T00:00:00",
+      .time.unit="seconds",
       .taxis.min=0,
       .taxis.max=10,
       .taxis.grid=FALSE,
@@ -169,9 +173,12 @@ ui_generate= function(vars, pars) {
         tags$hr(),
         fluidRow(
           column(2, p(style='",headStyle,"', 'Simulation time')),
-          column(1, div(style='",labStyle,"',textInput('.time.start', label = 'Start', value=",sett$.time.start,"))),
+          column(1, div(style='",labStyle,"',textInput('.time.start',label = 'Start', value=",sett$.time.start,"))),
           column(1, div(style='",labStyle,"',textInput('.time.end', label = 'End', value=",sett$.time.end,"))),
-          column(1, div(style='",labStyle,"',textInput('.time.dt', label = 'Step', value=",sett$.time.dt,")))
+          column(1, div(style='",labStyle,"',textInput('.time.dt', label = 'Step', value=",sett$.time.dt,"))),
+          column(1, div(style='",labStyle,"',selectInput('.time.unit', label = 'Unit',
+            choices=c('seconds','hours','days'), selected='",sett$.time.unit,"', multiple=FALSE, selectize=FALSE))),
+          column(2, div(style='",labStyle,"',textInput('.time.base', label = 'Base (ISO 8601)', value='",sett$.time.base,"')))
         ),
         fluidRow(
           column(2, p(style='",headStyle,"', 'Time axis')),

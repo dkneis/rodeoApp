@@ -41,6 +41,9 @@ visStoi= function(model, vars, pars, funsR) {
 #'
 #' @param out Object returned from latest call to \code{simul}.
 #' @param out_old Object returned from an earlier call to \code{simul}.
+#' @param timeUnit Unit of numeric simulation time info (as a string).
+#' @param timeBase Date and time of the startpoint of the simulation as a
+#'   value of class \code{POSIXct}.
 #' @param model Object of class \code{rodeo} representing the model.
 #' @param mult Named vector with multipliers to apply to variables before plotting.
 #' @param show Named logical vector to enable plotting of individual variables.
@@ -58,7 +61,8 @@ visStoi= function(model, vars, pars, funsR) {
 #' @author David Kneis \email{david.kneis@@tu-dresden.de}
 #'
 #' @export
-plotStates= function(out, out_old, model, mult, show, rangeT, rangeY,
+plotStates= function(out, out_old, timeUnit, timeBase,
+  model, mult, show, rangeT, rangeY,
   gridT, gridY, logY, showOld, obs) {
   clrHelp= colorRamp(c("violetred4","orangered2","indianred",
     "darkseagreen","dodgerblue3","blue4"), space="rgb")
@@ -70,7 +74,15 @@ plotStates= function(out, out_old, model, mult, show, rangeT, rangeY,
     }
     return(res)
   }
-  times= out[,1]
+  # Convert times
+  timeMult= c(seconds=1, hours=3600, days=86400)
+  if (!(timeUnit %in% names(timeMult)))
+    stop(paste0("time unit '",timeUnit,"' not supported"))
+  timeBase= as.POSIXct(strptime(timeBase,"%Y-%m-%dT%H:%M:%S"))
+  if (!is.finite(timeBase))
+    stop(paste0("base time '",timeBase,"' invalid of mal-formatted"))
+  times= timeBase + (out[,1] - out[1,1]) * timeMult[timeUnit]
+  rangeT= timeBase + (rangeT - out[1,1]) * timeMult[timeUnit]
   layout(matrix(1:2,ncol=2),widths=c(5,1))
   opar=par(c("mar", "cex"))
   par(mar=c(6,6,0.5,0.5), cex=1.25)
@@ -80,12 +92,12 @@ plotStates= function(out, out_old, model, mult, show, rangeT, rangeY,
   rect(xleft=usr[1], xright=usr[2], ybottom=ifelse(logY,10^usr[3],usr[3]),
     ytop=ifelse(logY,10^usr[4],usr[4]), col="grey90")
   if (gridT)
-    grid(nx=NULL, ny=NA, col="grey70")
+    grid(nx=NULL, ny=NA, col="grey60")
   if (gridY)
-    grid(nx=NA, ny=NULL, col="grey70")
+    grid(nx=NA, ny=NULL, col="grey60")
   # Previous output
   if ((!is.null(out_old)) && showOld) {
-    times_old= out_old[,1]
+    times_old= timeBase + (out_old[,1] - out_old[1,1]) * timeMult[timeUnit]
     for (i in 1:model$lenVars()) {
       varname= model$namesVars()[i]
       if (show[varname]) {
