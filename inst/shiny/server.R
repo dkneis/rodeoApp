@@ -94,8 +94,10 @@ shinyServer(function(input, output) {
     # Graphics
     plotStates(out, out_ref, model=get("rodeoApp.model",envir=globalenv()),
       mult=userData()$mult, show=userData()$show,
-      trange=as.numeric(c(input$.taxis.min,input$.taxis.max)),
-      yrange=as.numeric(c(input$.yaxis.min,input$.yaxis.max)),
+      rangeT=as.numeric(c(input$.taxis.min,input$.taxis.max)),
+      rangeY=as.numeric(c(input$.yaxis.min,input$.yaxis.max)),
+      gridT=input$.taxis.grid,
+      gridY=input$.yaxis.grid,
       logY=input$.yaxis.log,
       showOld=input$showRef,
       obs=get("rodeoApp.obs",envir=globalenv()))

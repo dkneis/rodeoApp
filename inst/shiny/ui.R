@@ -17,8 +17,10 @@ ui_generate= function(vars, pars) {
       .time.dt=    get(".time.dt",tempenv),
       .taxis.min=  get(".taxis.min",tempenv),
       .taxis.max=  get(".taxis.max",tempenv),
+      .taxis.grid= get(".taxis.grid",tempenv),
       .yaxis.min=  get(".yaxis.min",tempenv),
       .yaxis.max=  get(".yaxis.max",tempenv),
+      .yaxis.grid= get(".yaxis.grid",tempenv),
       .yaxis.log=  get(".yaxis.log",tempenv)
     )
     rm(tempenv)
@@ -29,8 +31,10 @@ ui_generate= function(vars, pars) {
       .time.dt=1,
       .taxis.min=0,
       .taxis.max=10,
+      .taxis.grid=FALSE,
       .yaxis.min= min(vars$default)*ifelse(min(vars$default) < 0,2,0.5),
       .yaxis.max= max(vars$default)*ifelse(max(vars$default) < 0,0.5,2),
+      .yaxis.grid=FALSE,
       .yaxis.log=FALSE
     )
   }
@@ -165,19 +169,21 @@ ui_generate= function(vars, pars) {
         tags$hr(),
         fluidRow(
           column(2, p(style='",headStyle,"', 'Simulation time')),
-          column(1, div(style='",labStyle,"',textInput('.time.start', label = 'start', value=",sett$.time.start,"))),
-          column(1, div(style='",labStyle,"',textInput('.time.end', label = 'end', value=",sett$.time.end,"))),
-          column(1, div(style='",labStyle,"',textInput('.time.dt', label = 'step', value=",sett$.time.dt,")))
+          column(1, div(style='",labStyle,"',textInput('.time.start', label = 'Start', value=",sett$.time.start,"))),
+          column(1, div(style='",labStyle,"',textInput('.time.end', label = 'End', value=",sett$.time.end,"))),
+          column(1, div(style='",labStyle,"',textInput('.time.dt', label = 'Step', value=",sett$.time.dt,")))
         ),
         fluidRow(
-          column(2, p(style='",headStyle,"', 'Time axis limits')),
-          column(1, div(style='",labStyle,"',textInput('.taxis.min', label = 'min.', value=",sett$.taxis.min,"))),
-          column(1, div(style='",labStyle,"',textInput('.taxis.max', label = 'max.', value=",sett$.taxis.max,")))
+          column(2, p(style='",headStyle,"', 'Time axis')),
+          column(1, div(style='",labStyle,"',textInput('.taxis.min', label = 'Min.', value=",sett$.taxis.min,"))),
+          column(1, div(style='",labStyle,"',textInput('.taxis.max', label = 'Max.', value=",sett$.taxis.max,"))),
+          column(1, div(style='",labStyle,"',checkboxInput('.taxis.grid', label='Grid', value=",sett$.taxis.grid,")))
         ),
         fluidRow(
-          column(2, p(style='",headStyle,"', 'Y axis limits')),
-          column(1, div(style='",labStyle,"',textInput('.yaxis.min', label = 'min.', value=",sett$.yaxis.min,"))),
-          column(1, div(style='",labStyle,"',textInput('.yaxis.max', label = 'max.', value=",sett$.yaxis.max,"))),
+          column(2, p(style='",headStyle,"', 'Y axis')),
+          column(1, div(style='",labStyle,"',textInput('.yaxis.min', label = 'Min.', value=",sett$.yaxis.min,"))),
+          column(1, div(style='",labStyle,"',textInput('.yaxis.max', label = 'Max.', value=",sett$.yaxis.max,"))),
+          column(1, div(style='",labStyle,"',checkboxInput('.yaxis.grid', label='Grid', value=",sett$.yaxis.grid,"))),
           column(1, div(style='",labStyle,"',checkboxInput('.yaxis.log', label='Log scale', value=",sett$.yaxis.log,")))
         )
       ) # End tabPanel

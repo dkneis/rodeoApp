@@ -44,8 +44,10 @@ visStoi= function(model, vars, pars, funsR) {
 #' @param model Object of class \code{rodeo} representing the model.
 #' @param mult Named vector with multipliers to apply to variables before plotting.
 #' @param show Named logical vector to enable plotting of individual variables.
-#' @param trange Range of the x-axis (time axis).
-#' @param yrange Range of the y-axis.
+#' @param rangeT Range of the x-axis (time axis).
+#' @param rangeY Range of the y-axis.
+#' @param gridT Logical to enable/disable grid for x-axis (time axis).
+#' @param gridY Logical to enable/disable grid for y-axis.
 #' @param logY Logical to switch between linear and log axis.
 #' @param showOld Logical. Enables/disables plotting of data in \code{out_old}.
 #' @param obs \code{NULL} or a data frame with observations (numeric time info
@@ -56,8 +58,8 @@ visStoi= function(model, vars, pars, funsR) {
 #' @author David Kneis \email{david.kneis@@tu-dresden.de}
 #'
 #' @export
-plotStates= function(out, out_old, model, mult, show, trange, yrange, logY,
-  showOld, obs) {
+plotStates= function(out, out_old, model, mult, show, rangeT, rangeY,
+  gridT, gridY, logY, showOld, obs) {
   clrHelp= colorRamp(c("violetred4","orangered2","indianred",
     "darkseagreen","dodgerblue3","blue4"), space="rgb")
   clr= function(i) {
@@ -72,11 +74,15 @@ plotStates= function(out, out_old, model, mult, show, trange, yrange, logY,
   layout(matrix(1:2,ncol=2),widths=c(5,1))
   opar=par(c("mar", "cex"))
   par(mar=c(6,6,0.5,0.5), cex=1.25)
-  plot(trange, yrange, type="n", log=ifelse(logY,"y",""),
+  plot(rangeT, rangeY, type="n", log=ifelse(logY,"y",""),
     xlab="Time", ylab="State variable(s)")
   usr= par("usr")
   rect(xleft=usr[1], xright=usr[2], ybottom=ifelse(logY,10^usr[3],usr[3]),
     ytop=ifelse(logY,10^usr[4],usr[4]), col="grey90")
+  if (gridT)
+    grid(nx=NULL, ny=NA, col="grey70")
+  if (gridY)
+    grid(nx=NA, ny=NULL, col="grey70")
   # Previous output
   if ((!is.null(out_old)) && showOld) {
     times_old= out_old[,1]

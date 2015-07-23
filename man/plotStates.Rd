@@ -4,7 +4,8 @@
 \alias{plotStates}
 \title{Plot state variables}
 \usage{
-plotStates(out, out_old, model, mult, show, trange, yrange, logY, showOld, obs)
+plotStates(out, out_old, model, mult, show, rangeT, rangeY, gridT, gridY, logY,
+  showOld, obs)
 }
 \arguments{
 \item{out}{Object returned from latest call to \code{simul}.}
@@ -17,9 +18,13 @@ plotStates(out, out_old, model, mult, show, trange, yrange, logY, showOld, obs)
 
 \item{show}{Named logical vector to enable plotting of individual variables.}
 
-\item{trange}{Range of the x-axis (time axis).}
+\item{rangeT}{Range of the x-axis (time axis).}
 
-\item{yrange}{Range of the y-axis.}
+\item{rangeY}{Range of the y-axis.}
+
+\item{gridT}{Logical to enable/disable grid for x-axis (time axis).}
+
+\item{gridY}{Logical to enable/disable grid for y-axis.}
 
 \item{logY}{Logical to switch between linear and log axis.}
 
