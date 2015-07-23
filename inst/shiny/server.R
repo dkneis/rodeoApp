@@ -85,8 +85,8 @@ shinyServer(function(input, output) {
     }
 
     # Dynamic simulation
-    t= seq(from=as.numeric(input$time.start), to=as.numeric(input$time.end),
-      by=as.numeric(input$time.dt))
+    t= seq(from=as.numeric(input$.time.start), to=as.numeric(input$.time.end),
+      by=as.numeric(input$.time.dt))
     out= simul(model=get("rodeoApp.model",envir=globalenv()),
       vars=v, pars= userData()$par,
       times=t, dllfile=get("rodeoApp.dllfile",envir=globalenv()),
@@ -94,9 +94,9 @@ shinyServer(function(input, output) {
     # Graphics
     plotStates(out, out_ref, model=get("rodeoApp.model",envir=globalenv()),
       mult=userData()$mult, show=userData()$show,
-      trange=as.numeric(c(input$taxis.min,input$taxis.max)),
-      yrange=as.numeric(c(input$yaxis.min,input$yaxis.max)),
-      logY=input$yaxis.log,
+      trange=as.numeric(c(input$.taxis.min,input$.taxis.max)),
+      yrange=as.numeric(c(input$.yaxis.min,input$.yaxis.max)),
+      logY=input$.yaxis.log,
       showOld=input$showRef,
       obs=get("rodeoApp.obs",envir=globalenv()))
     if (input$setRef > setRefCounter) {
@@ -108,16 +108,12 @@ shinyServer(function(input, output) {
   # Save settings on request
   observe({
     if (input$saveSettings > saveSettingsCounter) {
-      sets= c(
-        time.start=input$time.start,
-        time.end=input$time.end,
-        time.dt=input$time.dt,
-        taxis.min=input$taxis.min,
-        taxis.max=input$taxis.max,
-        yaxis.min=input$yaxis.min,
-        yaxis.max=input$yaxis.max,
-        yaxis.log=input$yaxis.log
-      )
+      nam= names(input)[grepl(pattern="^[.][a-zA-Z._]+", x=names(input))]
+      sets= vector("character", length(nam))
+      for (i in 1:length(nam)) {  # because single brackets, e.g. input[nam], not allowed
+        sets[i]= input[[nam[i]]]
+        names(sets)[i]= nam[i]
+      }
       write(x=paste(names(sets),sets,sep="=",collapse="\n"),
         file=get("rodeoApp.fileSettings",envir=globalenv()))
       saveSettingsCounter <<- input$saveSettings
