@@ -23,7 +23,11 @@ ui_generate= function(vars, pars) {
       .yaxis.min=  get(".yaxis.min",tempenv),
       .yaxis.max=  get(".yaxis.max",tempenv),
       .yaxis.grid= get(".yaxis.grid",tempenv),
-      .yaxis.log=  get(".yaxis.log",tempenv)
+      .yaxis.log=  get(".yaxis.log",tempenv),
+      .png.width=  get(".png.width",tempenv),
+      .png.height= get(".png.height",tempenv),
+      .png.res=    get(".png.res",tempenv),
+      .png.file=   get(".png.file",tempenv)
     )
     rm(tempenv)
   } else {
@@ -39,7 +43,11 @@ ui_generate= function(vars, pars) {
       .yaxis.min= min(vars$default)*ifelse(min(vars$default) < 0,2,0.5),
       .yaxis.max= max(vars$default)*ifelse(max(vars$default) < 0,0.5,2),
       .yaxis.grid=FALSE,
-      .yaxis.log=FALSE
+      .yaxis.log=FALSE,
+      .png.width=1200,
+      .png.height=800,
+      .png.res=150,
+      .png.file=gsub(pattern="\\", replacement="/", x=tempfile(fileext=".png"), fixed=TRUE)
     )
   }
 
@@ -192,7 +200,15 @@ ui_generate= function(vars, pars) {
           column(1, div(style='",labStyle,"',textInput('.yaxis.max', label = 'Max.', value=",sett$.yaxis.max,"))),
           column(1, div(style='",labStyle,"',checkboxInput('.yaxis.grid', label='Grid', value=",sett$.yaxis.grid,"))),
           column(1, div(style='",labStyle,"',checkboxInput('.yaxis.log', label='Log scale', value=",sett$.yaxis.log,")))
+        ),
+        fluidRow(
+          column(2, p(style='",headStyle,"', 'Saved image (png)')),
+          column(1, div(style='",labStyle,"',textInput('.png.width', label = 'Width (px)', value=",sett$.png.width,"))),
+          column(1, div(style='",labStyle,"',textInput('.png.height', label = 'Height (px)', value=",sett$.png.height,"))),
+          column(1, div(style='",labStyle,"',textInput('.png.res', label = 'Resol. (dpi)', value=",sett$.png.res,"))),
+          column(3, div(style='",labStyle,"',textInput('.png.file', label = 'File name', value='",sett$.png.file,"')))
         )
+
       ) # End tabPanel
 
     ) # End Navbar page
