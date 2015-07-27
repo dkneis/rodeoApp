@@ -56,19 +56,19 @@ ui_generate= function(vars, pars) {
     code=""
     rows= which(as.logical(pars$user))
     if (length(rows) > 0) {
-      for (i in rows) {
+      for (i in 1:length(rows)) {
         # Begin param name
         code=paste0(code,"        fluidRow(",newline)
         code=paste0(code,"          column(12,",newline)
-        code=paste0(code,"            div(style='",labStyle,"', '",pars$label[i],"')",newline)
+        code=paste0(code,"            div(style='",labStyle,"', '",pars$label[rows[i]],"')",newline)
         code=paste0(code,"          )",newline)
         code=paste0(code,"        ),",newline)
         # End param name
         code=paste0(code,"        fluidRow(",newline)
         code=paste0(code,"          column(12,",newline)
         code=paste0(code,"            div(style='",labStyle,
-          "',textInput('",pars$name[i],
-          "', label = '', value=",pars$default[i],"))",newline)
+          "',textInput('",pars$name[rows[i]],
+          "', label = '', value=",pars$default[rows[i]],"))",newline)
         code=paste0(code,"          )",newline)
         code=paste0(code,"        )",ifelse(i==length(rows),"",","),newline)
       }
