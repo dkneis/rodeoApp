@@ -16,7 +16,7 @@ if (!all(required %in% names(var)))
 var= var[,required]
 
 # Initializations for plotting of reference solution
-out_ref= NULL
+sim_ref= NULL
 setRefCounter= 0
 
 saveSettingsCounter= 0
@@ -26,7 +26,7 @@ saveSettingsCounter= 0
 # Define server
 shinyServer(function(input, output) {
 
-  # Set parameters and variables
+  # Set parameters and variables (--> items depend on the loaded model)
   userData= reactive({
     currentPar= data.frame(name=par$name, value=par$default, stringsAsFactors=FALSE)
     for (i in 1:nrow(currentPar)) {
@@ -61,39 +61,46 @@ shinyServer(function(input, output) {
     ))
   })
 
+  # Carry out a simulation run
+  sim= reactive({
+    inp= userData()
+    # Steady state simulation
+    names_steady= var$name[which(as.logical(var$steady))]
+    if (length(names_steady) > 0) {
+      sim= stst(model=get("rodeoApp.model",envir=globalenv()),
+        vars=inp$var, pars= inp$par,
+        dllfile=get("rodeoApp.dllfile",envir=globalenv()),
+        rtol=setNames(var$rtol, var$name), atol=setNames(var$atol, var$name))
+      inp$var[names_steady]= sim$y[names_steady]
+    }
+    # Dynamic simulation
+    t= seq(from=as.numeric(input$.time.start), to=as.numeric(input$.time.end),
+      by=as.numeric(input$.time.dt))
+    sim= simul(model=get("rodeoApp.model",envir=globalenv()),
+      vars=inp$var, pars= inp$par,
+      times=t, dllfile=get("rodeoApp.dllfile",envir=globalenv()),
+      rtol=setNames(var$rtol, var$name), atol=setNames(var$atol, var$name))
+    # Save as reference
+    if (input$setRef > setRefCounter) {
+      sim_ref <<- sim
+      setRefCounter <<- input$setRef 
+    }
+    return(sim)
+  })
+
   # Plot stoichiometry matrix
   output$visStoi <- renderText({
-  visStoi(model=get("rodeoApp.model",envir=globalenv()),
-      vars=userData()$var, pars=userData()$par,
+    inp= userData()
+    visStoi(model=get("rodeoApp.model",envir=globalenv()),
+      vars=inp$var, pars=inp$par,
       funsR=get("rodeoApp.funsR",envir=globalenv()))
   })
 
   # Simulate and plot state variables
   output$plotStates <- renderPlot({
-
-    # Store user-supplied initial values for possible further modification
-    v= userData()$var
-
-    # Steady state simulation
-    names_steady= var$name[which(as.logical(var$steady))]
-    if (length(names_steady) > 0) {
-      out= stst(model=get("rodeoApp.model",envir=globalenv()),
-        vars=v, pars= userData()$par,
-        dllfile=get("rodeoApp.dllfile",envir=globalenv()),
-        rtol=setNames(var$rtol, var$name), atol=setNames(var$atol, var$name))
-      v[names_steady]= out$y[names_steady]
-    }
-
-    # Dynamic simulation
-    t= seq(from=as.numeric(input$.time.start), to=as.numeric(input$.time.end),
-      by=as.numeric(input$.time.dt))
-    out= simul(model=get("rodeoApp.model",envir=globalenv()),
-      vars=v, pars= userData()$par,
-      times=t, dllfile=get("rodeoApp.dllfile",envir=globalenv()),
-      rtol=setNames(var$rtol, var$name), atol=setNames(var$atol, var$name))
     # Graphics
     plt= function() {
-      plotStates(out, out_ref, input$.time.unit, input$.time.base,
+      plotStates(sim(), sim_ref, input$.time.unit, input$.time.base,
         model=get("rodeoApp.model",envir=globalenv()),
         mult=userData()$mult, show=userData()$show,
         rangeT=as.numeric(c(input$.taxis.min,input$.taxis.max)),
@@ -110,11 +117,6 @@ shinyServer(function(input, output) {
     plotPNG(func=plt, filename=input$.png.file,
       width=as.numeric(input$.png.width), height=as.numeric(input$.png.height),
       res=as.numeric(input$.png.res))
-
-    if (input$setRef > setRefCounter) {
-      out_ref <<- out
-      setRefCounter <<- input$setRef 
-    }
   })
 
   # Save settings on request
