@@ -126,47 +126,12 @@ generateLib= function(model, source_f_fun) {
     x=paste0(tempfile(), ".f95"), fixed=TRUE)
   write(x=code, file=source_f_gen)
 #  cat("code written to",source_f_gen)
-  # Create wrapper code for compatibility with deSolve
-  code= paste(
-    "! Definition of the number of spatial levels",
-    "module spatial_dimension",
-    "implicit none",
-    "integer, parameter:: NLVL=1",
-    "end module",
-    " ",
-    "! Generic routine for parameter initialization",
-    "subroutine initmod(extfun)",
-    " use dimensions_and_indices   ! Module is provided by the generated code",
-    " use spatial_dimension",
-    " external extfun",
-    " double precision, dimension(NPAR*NLVL):: par",
-    " common /params/ par",
-    " call extfun(NPAR*NLVL, par)",
-    "end subroutine",
-    " ",
-    "! Generic wrapper around the generated code",
-    "subroutine derivs_wrapped (neq, t, y, ydot, yout, ip)",
-    " use dimensions_and_indices   ! Module is provided by the generated code",
-    " use spatial_dimension",
-    " implicit none",
-    " ! Inputs",
-    " integer, intent(in):: neq",
-    " double precision, intent(in):: t",
-    " double precision, dimension(neq), intent(in):: y",
-    " integer, dimension(*), intent(in)::ip",
-    " ! Outputs",
-    " double precision, dimension(neq), intent(out)::ydot",
-    " double precision, dimension(ip(2)), intent(out)::yout",
-    " ! Import parameters",
-    " double precision, dimension(NPAR*NLVL):: par",
-    " common /params/ par",
-    " !Call to generated code",
-    " call derivs(t, y, par, NLVL, ydot, yout)",
-    "end subroutine",
-    sep="\n")
+  # Create wrapper code for compatibility with deSolve; single spatial level
+  code= fortranWrapper_deSolve(1)
   source_f_wrp= gsub(pattern="\\", replacement="/",
     x=paste0(tempfile(), ".f95"), fixed=TRUE)
   write(x=code, file=source_f_wrp)
+#  cat("code written to",source_f_wrp)
   # Compile code
   dllname= "mySharedLib"
   dllfile= paste0(gsub(pattern="\\", replacement="/",
