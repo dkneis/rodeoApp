@@ -161,6 +161,11 @@ ui_generate= function(vars, pars) {
               column(12,
                 plotOutput(outputId='plotStates', height='600px', width='90%')
               )
+            ),
+            fluidRow(
+              column(2, div(style='",labStyle,"',actionButton('shiftLeft', label='<<'))),
+              column(8, ''),
+              column(2, div(style='",labStyle,"',actionButton('shiftRight', label='>>')))
             )
           )
         )

@@ -96,12 +96,19 @@ shinyServer(function(input, output) {
       funsR=get("rodeoApp.funsR",envir=globalenv()))
   })
 
-  # Simulate and plot state variables
+  # Observe time shift buttons
+#   observe({
+#     shiftLeftCount= <<- input$shiftLeft
+#     shiftRightCount= <<- input$shiftRight
+#  })
+
+  # Plot state variables
   output$plotStates <- renderPlot({
     # Graphics
     plt= function() {
-      tmin= as.numeric(input$.taxis.center) - 0.5*as.numeric(input$.taxis.width)
-      tmax= as.numeric(input$.taxis.center) + 0.5*as.numeric(input$.taxis.width)
+      tshift= (input$shiftRight - input$shiftLeft) * 0.25*as.numeric(input$.taxis.width)
+      tmin= as.numeric(input$.taxis.center) + tshift - 0.5*as.numeric(input$.taxis.width)
+      tmax= as.numeric(input$.taxis.center) + tshift + 0.5*as.numeric(input$.taxis.width)
       plotStates(sim(), sim_ref, input$.time.unit, input$.time.base,
         model=get("rodeoApp.model",envir=globalenv()),
         mult=userData()$mult, show=userData()$show,
