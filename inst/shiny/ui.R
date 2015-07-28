@@ -17,8 +17,8 @@ ui_generate= function(vars, pars) {
       .time.dt=    get(".time.dt",tempenv),
       .time.base=  get(".time.base",tempenv),
       .time.unit=  get(".time.unit",tempenv),
-      .taxis.min=  get(".taxis.min",tempenv),
-      .taxis.max=  get(".taxis.max",tempenv),
+      .taxis.center=  get(".taxis.center",tempenv),
+      .taxis.width=  get(".taxis.width",tempenv),
       .taxis.grid= get(".taxis.grid",tempenv),
       .yaxis.min=  get(".yaxis.min",tempenv),
       .yaxis.max=  get(".yaxis.max",tempenv),
@@ -29,6 +29,9 @@ ui_generate= function(vars, pars) {
       .png.res=    get(".png.res",tempenv),
       .png.file=   get(".png.file",tempenv)
     )
+    # handle case of non-existing directory (e.g. after re-start of R)
+    if (!dir.exists(dirname(sett$.png.file)))
+      sett$.png.file=gsub(pattern="\\", replacement="/", x=tempfile(fileext=".png"), fixed=TRUE)
     rm(tempenv)
   } else {
     sett= list(
@@ -37,8 +40,8 @@ ui_generate= function(vars, pars) {
       .time.dt=1,
       .time.base="1970-01-01T00:00:00",
       .time.unit="seconds",
-      .taxis.min=0,
-      .taxis.max=10,
+      .taxis.center=5,
+      .taxis.width=10,
       .taxis.grid=FALSE,
       .yaxis.min= min(vars$default)*ifelse(min(vars$default) < 0,2,0.5),
       .yaxis.max= max(vars$default)*ifelse(max(vars$default) < 0,0.5,2),
@@ -190,8 +193,8 @@ ui_generate= function(vars, pars) {
         ),
         fluidRow(
           column(2, p(style='",headStyle,"', 'Time axis')),
-          column(1, div(style='",labStyle,"',textInput('.taxis.min', label = 'Min.', value=",sett$.taxis.min,"))),
-          column(1, div(style='",labStyle,"',textInput('.taxis.max', label = 'Max.', value=",sett$.taxis.max,"))),
+          column(1, div(style='",labStyle,"',textInput('.taxis.center', label = 'Center', value=",sett$.taxis.center,"))),
+          column(1, div(style='",labStyle,"',textInput('.taxis.width', label = 'Width', value=",sett$.taxis.width,"))),
           column(1, div(style='",labStyle,"',checkboxInput('.taxis.grid', label='Grid', value=",sett$.taxis.grid,")))
         ),
         fluidRow(

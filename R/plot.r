@@ -35,6 +35,110 @@ visStoi= function(model, vars, pars, funsR) {
 }
 
 ################################################################################
+#' Find a reasonable time format
+#'
+#' Finds an appropriate time format specifier for a given time range
+#'
+#' @param tmin Lower limit of time axis (\code{POSIXct}).
+#' @param tmax Upper limit of time axis (\code{POSIXct}).
+#'
+#' @return A format string.
+#'
+#' @author David Kneis \email{david.kneis@@tu-dresden.de}
+
+timeFmt= function(tmin, tmax) {
+  secrange= as.numeric(difftime(tmax, tmin, units="secs"))
+  if (secrange > 86400*62) {
+    fmt="%d %b '%y"
+  } else if ((secrange > 86400*7) && (secrange <= 86400*62)) {
+    fmt="%d %b"
+  } else if ((secrange > 86400) && (secrange <= 86400*7)) {
+    fmt="%d %b %Hh"
+  } else {
+    fmt="%H:%M:%S"
+  }
+  return(fmt)
+}
+
+################################################################################
+#' Create a vector of times for labelling a time axis.
+#'
+#' This algorithm usually gives better results than axis.POSIXt.
+#'
+#' @param tmin Lower limit of time axis (\code{POSIXct}).
+#' @param tmax Upper limit of time axis (\code{POSIXct}).
+#' @param n Desired number of axis ticks.
+#'
+#' @return A list with components \code{values} and \code{format}. See example
+#'   for usage.
+#'
+#' @author David Kneis \email{david.kneis@@tu-dresden.de}
+#'
+#' @examples
+#' \dontrun{
+#'   times= prettyTimes(lower, upper, 10)
+#'   axis.POSIXct(1, at=times$values, format=times$format, las=2, xlab="")
+#' }
+
+prettyTimes= function(tmin, tmax, n) {
+  # Correct unreasonable n
+  if (n < 2) n= 2
+  # Years
+  s= seq.POSIXt(from= tmin, to=tmax, by="year")
+  k= length(s) 
+  if (k >= n) {
+    i= 1:n * ceiling(k/n)
+    t1= ISOdatetime(format(s[1],"%Y"),1,1,0,0,0)
+    t2= ISOdatetime(format(s[k],"%Y"),1,1,0,0,0)
+    x= seq.POSIXt(from=t1, to=t2, by="year")
+    return(list(values=x[i[i<=k]], format=timeFmt(tmin,tmax)))
+  }
+  # Months
+  s= seq.POSIXt(from= tmin, to=tmax, by="month")
+  k= length(s) 
+  if (k >= n) {
+    i= 1:n * ceiling(k/n)
+    t1= ISOdatetime(format(s[1],"%Y"),format(s[1],"%m"),1,0,0,0)
+    t2= ISOdatetime(format(s[k],"%Y"),format(s[k],"%m"),1,0,0,0)
+    x= seq.POSIXt(from=t1, to=t2, by="month")
+    return(list(values=x[i[i<=k]], format=timeFmt(tmin,tmax)))
+  }
+  # Days
+  s= seq.POSIXt(from= tmin, to=tmax, by="day")
+  k= length(s) 
+  if (k >= n) {
+    i= 1:n * ceiling(k/n)
+    t1= ISOdatetime(format(s[1],"%Y"),format(s[1],"%m"),format(s[1],"%d"),0,0,0)
+    t2= ISOdatetime(format(s[k],"%Y"),format(s[k],"%m"),format(s[k],"%d"),0,0,0)
+    x= seq.POSIXt(from=t1, to=t2, by="day")
+    return(list(values=x[i[i<=k]], format=timeFmt(tmin,tmax)))
+  }
+  # Hours
+  s= seq.POSIXt(from= tmin, to=tmax, by="hour")
+  k= length(s) 
+  if (k >= n) {
+    i= 1:n * ceiling(k/n)
+    t1= ISOdatetime(format(s[1],"%Y"),format(s[1],"%m"),format(s[1],"%d"),format(s[1],"%H"),0,0)
+    t2= ISOdatetime(format(s[k],"%Y"),format(s[k],"%m"),format(s[k],"%d"),format(s[k],"%H"),0,0)
+    x= seq.POSIXt(from=t1, to=t2, by="hour")
+    return(list(values=x[i[i<=k]], format=timeFmt(tmin,tmax)))
+  }
+  # Minutes
+  s= seq.POSIXt(from= tmin, to=tmax, by="min")
+  k= length(s) 
+  if (k >= n) {
+    i= 1:n * ceiling(k/n)
+    t1= ISOdatetime(format(s[1],"%Y"),format(s[1],"%m"),format(s[1],"%d"),format(s[1],"%H"),format(s[1],"%M"),0)
+    t2= ISOdatetime(format(s[k],"%Y"),format(s[k],"%m"),format(s[k],"%d"),format(s[k],"%H"),format(s[k],"%M"),0)
+    x= seq.POSIXt(from=t1, to=t2, by="min")
+    return(list(values=x[i[i<=k]], format=timeFmt(tmin,tmax)))
+  }
+  # Seconds
+  x= seq.POSIXt(from= tmin, to=tmax, length.out=n)
+  return(list(values=x, format=timeFmt(tmin,tmax)))
+}
+
+################################################################################
 #' Plot state variables
 #'
 #' Plots the simulated dynamics of state variables.
@@ -86,13 +190,15 @@ plotStates= function(out, out_old, timeUnit, timeBase,
   layout(matrix(1:2,ncol=2),widths=c(5,1))
   opar=par(c("mar", "cex"))
   par(mar=c(6,6,1.5,0.5), cex=1.25)
-  plot(rangeT, rangeY, type="n", log=ifelse(logY,"y",""),
-    xlab="Time", ylab="State variable(s)")
+  plot(rangeT, rangeY, type="n", log=ifelse(logY,"y",""), xaxt="n",
+    xlab="", ylab="State variable(s)")
+  timeTicks= prettyTimes(rangeT[1], rangeT[2], 10)
+  axis.POSIXct(side=1, at=timeTicks$values, format=timeTicks$format, las=2)
   usr= par("usr")
   rect(xleft=usr[1], xright=usr[2], ybottom=ifelse(logY,10^usr[3],usr[3]),
     ytop=ifelse(logY,10^usr[4],usr[4]), col="grey90")
   if (gridT)
-    grid(nx=NULL, ny=NA, col="grey60")
+    abline(v=timeTicks$values, col="grey60")
   if (gridY)
     grid(nx=NA, ny=NULL, col="grey60")
   # Previous output

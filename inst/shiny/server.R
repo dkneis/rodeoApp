@@ -100,10 +100,12 @@ shinyServer(function(input, output) {
   output$plotStates <- renderPlot({
     # Graphics
     plt= function() {
+      tmin= as.numeric(input$.taxis.center) - 0.5*as.numeric(input$.taxis.width)
+      tmax= as.numeric(input$.taxis.center) + 0.5*as.numeric(input$.taxis.width)
       plotStates(sim(), sim_ref, input$.time.unit, input$.time.base,
         model=get("rodeoApp.model",envir=globalenv()),
         mult=userData()$mult, show=userData()$show,
-        rangeT=as.numeric(c(input$.taxis.min,input$.taxis.max)),
+        rangeT=c(tmin,tmax),
         rangeY=as.numeric(c(input$.yaxis.min,input$.yaxis.max)),
         gridT=input$.taxis.grid,
         gridY=input$.yaxis.grid,
