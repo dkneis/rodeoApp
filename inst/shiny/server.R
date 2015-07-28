@@ -106,7 +106,7 @@ shinyServer(function(input, output) {
   output$plotStates <- renderPlot({
     # Graphics
     plt= function() {
-      tshift= (input$shiftRight - input$shiftLeft) * 0.25*as.numeric(input$.taxis.width)
+      tshift= (input$shiftRight - input$shiftLeft) * 0.2 * as.numeric(input$.taxis.width)
       tmin= as.numeric(input$.taxis.center) + tshift - 0.5*as.numeric(input$.taxis.width)
       tmax= as.numeric(input$.taxis.center) + tshift + 0.5*as.numeric(input$.taxis.width)
       plotStates(sim(), sim_ref, input$.time.unit, input$.time.base,
