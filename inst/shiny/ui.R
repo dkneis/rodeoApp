@@ -163,9 +163,13 @@ ui_generate= function(vars, pars) {
               )
             ),
             fluidRow(
-              column(2, div(style='",labStyle,"',actionButton('shiftLeft', label='<<'))),
-              column(8, ''),
-              column(2, div(style='",labStyle,"',actionButton('shiftRight', label='>>')))
+              column(3, ''),
+              column(1, div(style='",labStyle,"',actionButton('tShiftLeft', label='', icon=icon('backward')))),
+              column(1, div(style='",labStyle,"',actionButton('tZoomIn', label='', icon=icon('search-plus')))),
+              column(1, div(style='",labStyle,"',actionButton('tZoomOut', label='', icon=icon('search-minus')))),
+              column(1, div(style='",labStyle,"',actionButton('tShiftRight', label='', icon=icon('forward')))),
+              column(2, div(style='",labStyle,"',actionButton('tReset', label='Reset'))),
+              column(3, '')
             )
           )
         )
@@ -197,7 +201,7 @@ ui_generate= function(vars, pars) {
           column(2, div(style='",labStyle,"',textInput('.time.base', label = 'Base (ISO 8601)', value='",sett$.time.base,"')))
         ),
         fluidRow(
-          column(2, p(style='",headStyle,"', 'Time axis')),
+          column(2, p(style='",headStyle,"', 'Time axis (init.)')),
           column(1, div(style='",labStyle,"',textInput('.taxis.center', label = 'Center', value=",sett$.taxis.center,"))),
           column(1, div(style='",labStyle,"',textInput('.taxis.width', label = 'Width', value=",sett$.taxis.width,"))),
           column(1, div(style='",labStyle,"',checkboxInput('.taxis.grid', label='Grid', value=",sett$.taxis.grid,")))

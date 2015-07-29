@@ -17,9 +17,21 @@ var= var[,required]
 
 # Initializations for plotting of reference solution
 sim_ref= NULL
-setRefCounter= 0
 
-saveSettingsCounter= 0
+buttonCount= c(
+  setRef= 0,
+  saveSettings= 0,
+  tShiftLeft= 0,
+  tShiftRight= 0,
+  tZoomIn= 0,
+  tZoomOut= 0,
+  tReset= 0
+)
+
+taxis= c(
+  center= NA,
+  width= NA
+)
 
 ################################################################################
 
@@ -81,9 +93,9 @@ shinyServer(function(input, output) {
       times=t, dllfile=get("rodeoApp.dllfile",envir=globalenv()),
       rtol=setNames(var$rtol, var$name), atol=setNames(var$atol, var$name))
     # Save as reference
-    if (input$setRef > setRefCounter) {
+    if (input$setRef > buttonCount["setRef"]) {
       sim_ref <<- sim
-      setRefCounter <<- input$setRef 
+      buttonCount["setRef"] <<- input$setRef 
     }
     return(sim)
   })
@@ -96,19 +108,42 @@ shinyServer(function(input, output) {
       funsR=get("rodeoApp.funsR",envir=globalenv()))
   })
 
-  # Observe time shift buttons
-#   observe({
-#     shiftLeftCount= <<- input$shiftLeft
-#     shiftRightCount= <<- input$shiftRight
-#  })
 
   # Plot state variables
   output$plotStates <- renderPlot({
+    # Observe state of interactive time scrolling/zooming
+    if (input$tReset > buttonCount["tReset"]) {
+      buttonCount["tReset"] <<- input$tReset
+      reset= TRUE
+    } else {
+      reset= FALSE
+    }
+    if ((sum(c(buttonCount["tShiftLeft"], buttonCount["tShiftRight"])) == 0) || reset)
+      taxis["center"] <<- as.numeric(input$.taxis.center)
+    if ((sum(c(buttonCount["tZoomIn"], buttonCount["tZoomOut"])) == 0) || reset)
+      taxis["width"] <<- as.numeric(input$.taxis.width)
+    if (input$tZoomIn > buttonCount["tZoomIn"]) {
+      buttonCount["tZoomIn"] <<- input$tZoomIn
+      taxis["width"] <<- taxis["width"] * 2/3
+    }
+    if (input$tZoomOut > buttonCount["tZoomOut"]) {
+      buttonCount["tZoomOut"] <<- input$tZoomOut
+      taxis["width"] <<- taxis["width"] * 3/2
+    }
+    if (input$tShiftLeft > buttonCount["tShiftLeft"]) {
+      buttonCount["tShiftLeft"] <<- input$tShiftLeft
+      taxis["center"] <<- taxis["center"] - 0.2 * taxis["width"]
+    }
+    if (input$tShiftRight > buttonCount["tShiftRight"]) {
+      buttonCount["tShiftRight"] <<- input$tShiftRight
+      taxis["center"] <<- taxis["center"] + 0.2 * taxis["width"]
+    }
+
     # Graphics
     plt= function() {
-      tshift= (input$shiftRight - input$shiftLeft) * 0.2 * as.numeric(input$.taxis.width)
-      tmin= as.numeric(input$.taxis.center) + tshift - 0.5*as.numeric(input$.taxis.width)
-      tmax= as.numeric(input$.taxis.center) + tshift + 0.5*as.numeric(input$.taxis.width)
+      tmin= taxis["center"] - 0.5 * taxis["width"]
+      tmax= taxis["center"] + 0.5 * taxis["width"]
+
       plotStates(sim(), sim_ref, input$.time.unit, input$.time.base,
         model=get("rodeoApp.model",envir=globalenv()),
         mult=userData()$mult, show=userData()$show,
@@ -130,7 +165,8 @@ shinyServer(function(input, output) {
 
   # Save settings on request
   observe({
-    if (input$saveSettings > saveSettingsCounter) {
+    if (input$saveSettings > buttonCount["saveSettings"]) {
+      buttonCount["saveSettings"] <<- input$saveSettings
       nam= names(input)[grepl(pattern="^[.][a-zA-Z._]+", x=names(input))]
       sets= vector("character", length(nam))
       for (i in 1:length(nam)) {  # because single brackets, e.g. input[nam], not allowed
@@ -139,7 +175,6 @@ shinyServer(function(input, output) {
       }
       write(x=paste(names(sets),sets,sep="=",collapse="\n"),
         file=get("rodeoApp.fileSettings",envir=globalenv()))
-      saveSettingsCounter <<- input$saveSettings
     }
   })
 
