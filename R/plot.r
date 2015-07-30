@@ -156,6 +156,7 @@ prettyTimes= function(tmin, tmax, n) {
 #' @param gridT Logical to enable/disable grid for x-axis (time axis).
 #' @param gridY Logical to enable/disable grid for y-axis.
 #' @param logY Logical to switch between linear and log axis.
+#' @param labelY Y-axis label.
 #' @param showOld Logical. Enables/disables plotting of data in \code{out_old}.
 #' @param obs \code{NULL} or a data frame with observations (numeric time info
 #'   is expected in the first column).
@@ -167,7 +168,7 @@ prettyTimes= function(tmin, tmax, n) {
 #' @export
 plotStates= function(out, out_old, timeUnit, timeBase,
   model, mult, show, rangeT, rangeY,
-  gridT, gridY, logY, showOld, obs) {
+  gridT, gridY, logY, labelY, showOld, obs) {
   clrHelp= colorRamp(c("violetred4","orangered2","indianred",
     "darkseagreen","dodgerblue3","blue4"), space="rgb")
   clr= function(i) {
@@ -191,7 +192,7 @@ plotStates= function(out, out_old, timeUnit, timeBase,
   opar=par(c("mar", "cex"))
   par(mar=c(6,6,1.5,0.5), cex=1.25)
   plot(rangeT, rangeY, type="n", log=ifelse(logY,"y",""), xaxt="n",
-    xlab="", ylab="State variable(s)")
+    xlab="", ylab=labelY)
   timeTicks= prettyTimes(rangeT[1], rangeT[2], 10)
   axis.POSIXct(side=1, at=timeTicks$values, format=timeTicks$format, las=2)
   usr= par("usr")

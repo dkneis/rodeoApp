@@ -5,7 +5,7 @@
 \title{Plot state variables}
 \usage{
 plotStates(out, out_old, timeUnit, timeBase, model, mult, show, rangeT, rangeY,
-  gridT, gridY, logY, showOld, obs)
+  gridT, gridY, logY, labelY, showOld, obs)
 }
 \arguments{
 \item{out}{Object returned from latest call to \code{simul}.}
@@ -32,6 +32,8 @@ value of class \code{POSIXct}.}
 \item{gridY}{Logical to enable/disable grid for y-axis.}
 
 \item{logY}{Logical to switch between linear and log axis.}
+
+\item{labelY}{Y-axis label.}
 
 \item{showOld}{Logical. Enables/disables plotting of data in \code{out_old}.}
 

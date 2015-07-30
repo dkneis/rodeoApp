@@ -21,6 +21,7 @@ sim_ref= NULL
 buttonCount= c(
   setRef= 0,
   saveSettings= 0,
+  saveImage= 0,
   tShiftLeft= 0,
   tShiftRight= 0,
   tZoomIn= 0,
@@ -119,9 +120,18 @@ shinyServer(function(input, output) {
       reset= FALSE
     }
     if ((sum(c(buttonCount["tShiftLeft"], buttonCount["tShiftRight"])) == 0) || reset)
-      taxis["center"] <<- as.numeric(input$.taxis.center)
+      if (grepl(pattern="[0-9]",x=input$.taxis.center)) {
+        taxis["center"] <<- as.numeric(input$.taxis.center)
+      } else {
+        taxis["center"] <<- as.numeric(input$.time.start) + 0.5 *
+          (as.numeric(input$.time.end) - as.numeric(input$.time.start))
+      }
     if ((sum(c(buttonCount["tZoomIn"], buttonCount["tZoomOut"])) == 0) || reset)
-      taxis["width"] <<- as.numeric(input$.taxis.width)
+      if (grepl(pattern="[0-9]",x=input$.taxis.width)) {
+        taxis["width"] <<- as.numeric(input$.taxis.width)
+      } else {
+        taxis["width"] <<- as.numeric(input$.time.end) - as.numeric(input$.time.start)
+      }
     if (input$tZoomIn > buttonCount["tZoomIn"]) {
       buttonCount["tZoomIn"] <<- input$tZoomIn
       taxis["width"] <<- taxis["width"] * 2/3
@@ -152,15 +162,20 @@ shinyServer(function(input, output) {
         gridT=input$.taxis.grid,
         gridY=input$.yaxis.grid,
         logY=input$.yaxis.log,
+        labelY=input$.yaxis.label,
         showOld=input$showRef,
         obs=get("rodeoApp.obs",envir=globalenv()))
     }
     # plot to screen
     plt()
     # plot to file
-    plotPNG(func=plt, filename=input$.png.file,
-      width=as.numeric(input$.png.width), height=as.numeric(input$.png.height),
-      res=as.numeric(input$.png.res))
+    if (input$saveImage > buttonCount["saveImage"]) {
+      buttonCount["saveImage"] <<- input$saveImage
+      plotPNG(func=plt, filename=paste0(input$.png.dir,"/",
+        format(Sys.time(),"%Y-%m-%dT%H%M%S"),".png"),
+        width=as.numeric(input$.png.width), height=as.numeric(input$.png.height),
+        res=as.numeric(input$.png.res))
+    }
   })
 
   # Save settings on request

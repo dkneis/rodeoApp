@@ -24,14 +24,15 @@ ui_generate= function(vars, pars) {
       .yaxis.max=  get(".yaxis.max",tempenv),
       .yaxis.grid= get(".yaxis.grid",tempenv),
       .yaxis.log=  get(".yaxis.log",tempenv),
+      .yaxis.label=  get(".yaxis.label",tempenv),
       .png.width=  get(".png.width",tempenv),
       .png.height= get(".png.height",tempenv),
       .png.res=    get(".png.res",tempenv),
-      .png.file=   get(".png.file",tempenv)
+      .png.dir=   get(".png.dir",tempenv)
     )
     # handle case of non-existing directory (e.g. after re-start of R)
-    if (!dir.exists(dirname(sett$.png.file)))
-      sett$.png.file=gsub(pattern="\\", replacement="/", x=tempfile(fileext=".png"), fixed=TRUE)
+    if (!dir.exists(sett$.png.dir))
+      sett$.png.dir=gsub(pattern="\\", replacement="/", x=tempdir(), fixed=TRUE)
     rm(tempenv)
   } else {
     sett= list(
@@ -40,17 +41,18 @@ ui_generate= function(vars, pars) {
       .time.dt=1,
       .time.base="1970-01-01T00:00:00",
       .time.unit="seconds",
-      .taxis.center=5,
-      .taxis.width=10,
+      .taxis.center=NA,
+      .taxis.width=NA,
       .taxis.grid=FALSE,
       .yaxis.min= min(vars$default)*ifelse(min(vars$default) < 0,2,0.5),
       .yaxis.max= max(vars$default)*ifelse(max(vars$default) < 0,0.5,2),
       .yaxis.grid=FALSE,
       .yaxis.log=FALSE,
+      .yaxis.label="State variable(s)",
       .png.width=1200,
       .png.height=800,
       .png.res=150,
-      .png.file=gsub(pattern="\\", replacement="/", x=tempfile(fileext=".png"), fixed=TRUE)
+      .png.dir=gsub(pattern="\\", replacement="/", x=tempdir(), fixed=TRUE)
     )
   }
 
@@ -141,7 +143,8 @@ ui_generate= function(vars, pars) {
           ),
           column(2, p('')),
           column(2, div(style='",labStyle,"',actionButton('setRef', label='Set as reference'))),
-          column(2, div(style='",labStyle,"',checkboxInput('showRef', label='Show reference', value = FALSE)))
+          column(2, div(style='",labStyle,"',checkboxInput('showRef', label='Show reference', value = FALSE))),
+          column(2, div(style='",labStyle,"',actionButton('saveImage', label='Save image')))
         ),
         fluidRow(
           column(2,style = 'overflow-y:scroll; max-height: 800px',
@@ -211,14 +214,15 @@ ui_generate= function(vars, pars) {
           column(1, div(style='",labStyle,"',textInput('.yaxis.min', label = 'Min.', value=",sett$.yaxis.min,"))),
           column(1, div(style='",labStyle,"',textInput('.yaxis.max', label = 'Max.', value=",sett$.yaxis.max,"))),
           column(1, div(style='",labStyle,"',checkboxInput('.yaxis.grid', label='Grid', value=",sett$.yaxis.grid,"))),
-          column(1, div(style='",labStyle,"',checkboxInput('.yaxis.log', label='Log scale', value=",sett$.yaxis.log,")))
+          column(1, div(style='",labStyle,"',checkboxInput('.yaxis.log', label='Log scale', value=",sett$.yaxis.log,"))),
+          column(1, div(style='",labStyle,"',textInput('.yaxis.label', label = 'Label', value='",sett$.yaxis.label,"')))
         ),
         fluidRow(
-          column(2, p(style='",headStyle,"', 'Saved image (png)')),
+          column(2, p(style='",headStyle,"', 'Saved images (.png)')),
           column(1, div(style='",labStyle,"',textInput('.png.width', label = 'Width (px)', value=",sett$.png.width,"))),
           column(1, div(style='",labStyle,"',textInput('.png.height', label = 'Height (px)', value=",sett$.png.height,"))),
           column(1, div(style='",labStyle,"',textInput('.png.res', label = 'Resol. (dpi)', value=",sett$.png.res,"))),
-          column(3, div(style='",labStyle,"',textInput('.png.file', label = 'File name', value='",sett$.png.file,"')))
+          column(3, div(style='",labStyle,"',textInput('.png.dir', label = 'Output folder', value='",sett$.png.dir,"')))
         )
 
       ) # End tabPanel
