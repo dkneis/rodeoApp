@@ -1,4 +1,7 @@
 
+# Set working directory
+setwd(get("rodeoApp.wd",envir=globalenv()))
+
 # Get info on parameters and variables
 
 par= get("rodeoApp.pars",envir=globalenv())

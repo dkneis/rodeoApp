@@ -40,6 +40,9 @@ runGUI= function(
   assign(x="rodeoApp.pars", value=ini$pars, envir=globalenv())
   assign(x="rodeoApp.obs", value=obs, envir=globalenv())
 
+  # Pass the current working directory
+  assign(x="rodeoApp.wd", value=getwd(), envir=globalenv())
+
   # To save preferences file
   fileSettings= paste0(dir,"/rodeoApp.savedSettings")
   assign(x="rodeoApp.fileSettings", value=fileSettings, envir=globalenv())
