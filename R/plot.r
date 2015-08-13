@@ -190,7 +190,7 @@ plotStates= function(out, out_old, timeUnit, timeBase,
   rangeT= timeBase + (rangeT - out[1,1]) * timeMult[timeUnit]
   layout(matrix(1:2,ncol=2),widths=c(5,1))
   opar=par(c("mar", "cex"))
-  par(mar=c(6,6,1.5,0.5), cex=1.25)
+  par(mar=c(6,4.1,1.5,0.5), cex=1.25)
   plot(rangeT, rangeY, type="n", log=ifelse(logY,"y",""), xaxt="n",
     xlab="", ylab=labelY)
   timeTicks= prettyTimes(rangeT[1], rangeT[2], 10)

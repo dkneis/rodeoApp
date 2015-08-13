@@ -29,13 +29,14 @@ buttonCount= c(
   tShiftRight= 0,
   tZoomIn= 0,
   tZoomOut= 0,
-  tReset= 0
+  tReset= 0,
+  yZoomIn= 0,
+  yZoomOut= 0,
+  yReset= 0
 )
 
-taxis= c(
-  center= NA,
-  width= NA
-)
+taxis= c(center= NA, width= NA)
+yaxis= c(min= NA, max= NA)
 
 ################################################################################
 
@@ -151,6 +152,25 @@ shinyServer(function(input, output) {
       buttonCount["tShiftRight"] <<- input$tShiftRight
       taxis["center"] <<- taxis["center"] + 0.2 * taxis["width"]
     }
+    # Observe state of interactive y-zooming
+    if (input$yReset > buttonCount["yReset"]) {
+      buttonCount["yReset"] <<- input$yReset
+      reset= TRUE
+    } else {
+      reset= FALSE
+    }
+    if ((sum(c(buttonCount["yZoomIn"], buttonCount["yZoomOut"])) == 0) || reset) {
+      yaxis["min"] <<- as.numeric(input$.yaxis.min)
+      yaxis["max"] <<- as.numeric(input$.yaxis.max)
+    }
+    if (input$yZoomIn > buttonCount["yZoomIn"]) {
+      buttonCount["yZoomIn"] <<- input$yZoomIn
+      yaxis["max"] <<- yaxis["max"] - 0.2 * (yaxis["max"] - yaxis["min"])
+    }
+    if (input$yZoomOut > buttonCount["yZoomOut"]) {
+      buttonCount["yZoomOut"] <<- input$yZoomOut
+      yaxis["max"] <<- yaxis["max"] + 0.2 * (yaxis["max"] - yaxis["min"])
+    }
 
     # Graphics
     plt= function() {
@@ -161,7 +181,7 @@ shinyServer(function(input, output) {
         model=get("rodeoApp.model",envir=globalenv()),
         mult=userData()$mult, show=userData()$show,
         rangeT=c(tmin,tmax),
-        rangeY=as.numeric(c(input$.yaxis.min,input$.yaxis.max)),
+        rangeY=c(yaxis["min"], yaxis["max"]),
         gridT=input$.taxis.grid,
         gridY=input$.yaxis.grid,
         logY=input$.yaxis.log,

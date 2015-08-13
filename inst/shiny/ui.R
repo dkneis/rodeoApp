@@ -124,7 +124,7 @@ ui_generate= function(vars, pars) {
       # New tab panel
       tabPanel('Dynamic simulation',
         fluidRow(
-          column(2,
+          column(1,
             p(style='",headStyle,"', 'Parameters')
           ),
           column(2,
@@ -141,13 +141,13 @@ ui_generate= function(vars, pars) {
               )
             )
           ),
-          column(2, p('')),
+          column(3, p('')),
           column(2, div(style='",labStyle,"',actionButton('setRef', label='Set as reference'))),
           column(2, div(style='",labStyle,"',checkboxInput('showRef', label='Show reference', value = FALSE))),
           column(2, div(style='",labStyle,"',actionButton('saveImage', label='Save image')))
         ),
         fluidRow(
-          column(2,style = 'overflow-y:scroll; max-height: 800px',
+          column(1,style = 'overflow-y:scroll; max-height: 800px',
     ",
     # Parameters
     inputPars(),
@@ -159,11 +159,20 @@ ui_generate= function(vars, pars) {
     inputVars(),
     "
           ),
+          column(1,
+            fluidRow(
+              column(12, div(style='",labStyle,"',actionButton('yZoomIn', label='', icon=icon('search-plus'))))
+            ),
+            fluidRow(
+              column(12, div(style='",labStyle,"',actionButton('yZoomOut', label='', icon=icon('search-minus'))))
+            ),
+            fluidRow(
+              column(12, div(style='",labStyle,"',actionButton('yReset', label='', icon=icon('undo'))))
+            )
+          ),
           column(8,
             fluidRow(
-              column(12,
-                plotOutput(outputId='plotStates', height='600px', width='90%')
-              )
+              column(12, plotOutput(outputId='plotStates', height='600px', width='90%'))
             ),
             fluidRow(
               column(3, ''),
@@ -171,7 +180,7 @@ ui_generate= function(vars, pars) {
               column(1, div(style='",labStyle,"',actionButton('tZoomIn', label='', icon=icon('search-plus')))),
               column(1, div(style='",labStyle,"',actionButton('tZoomOut', label='', icon=icon('search-minus')))),
               column(1, div(style='",labStyle,"',actionButton('tShiftRight', label='', icon=icon('forward')))),
-              column(2, div(style='",labStyle,"',actionButton('tReset', label='Reset'))),
+              column(2, div(style='",labStyle,"',actionButton('tReset', label='', icon=icon('undo')))),
               column(3, '')
             )
           )
