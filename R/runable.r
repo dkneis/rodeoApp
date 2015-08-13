@@ -29,6 +29,7 @@ runGUI= function(
   tables= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi"),
   colsep=",", obs=NULL
 ) {
+  dir= normalizePath(dir)
   # Run init
   ini= initModel(dir=dir, xlFile=xlFile, funsR=funsR, funsF=funsF,
     tables=tables, colsep=colsep)
@@ -105,6 +106,7 @@ runMCS= function(
   colsep=",",
   silent=FALSE
 ) {
+  dir= normalizePath(dir)
   # Initialize model
   ini= initModel(dir=dir, xlFile=xlFile, funsR=funsR, funsF=funsF,
     tables=tables, colsep=colsep)
