@@ -188,7 +188,7 @@ ui_generate= function(vars, pars) {
       ), # End tabPanel
 
       # New tab panel
-      tabPanel('Peterson matrix',
+      tabPanel('Stoich. matrix',
         fluidRow(
           column(12,
             htmlOutput(outputId='visStoi', inline=FALSE)
