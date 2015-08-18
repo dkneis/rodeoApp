@@ -41,7 +41,8 @@ column. Columns with observation data (if existing) must be named like the
 simulated state variables. Missing values must be marked as \code{NA}.}
 
 \item{serverMode}{Defaults to \code{FALSE}. If set to \code{TRUE}, data
-  required by the GUI are written to disk only (the shiny app is not run).}
+  required by the GUI are saved to disk only (and the shiny app is
+  \emph{not} run).}
 }
 \value{
 \code{NULL} if \code{serverMode} is \code{FALSE} or the

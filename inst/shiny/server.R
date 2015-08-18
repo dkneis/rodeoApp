@@ -206,21 +206,21 @@ shinyServer(function(input, output) {
   })
 
   # Save settings on request
-  observe({
-    if (input$saveSettings > buttonCount["saveSettings"]) {
-      buttonCount["saveSettings"] <<- input$saveSettings
-      nam= names(input)[grepl(pattern="^[.][a-zA-Z._]+", x=names(input))]
-      sets= vector("character", length(nam))
-      for (i in 1:length(nam)) {  # because single brackets, e.g. input[nam], not allowed
-        sets[i]= paste0("'",input[[nam[i]]],"'")
-        names(sets)[i]= nam[i]
-      }
-      if (!rodeoAppData$serverMode) {
+  if (!rodeoAppData$serverMode) {
+    observe({
+      if (input$saveSettings > buttonCount["saveSettings"]) {
+        buttonCount["saveSettings"] <<- input$saveSettings
+        nam= names(input)[grepl(pattern="^[.][a-zA-Z._]+", x=names(input))]
+        sets= vector("character", length(nam))
+        for (i in 1:length(nam)) {  # because single brackets, e.g. input[nam], not allowed
+          sets[i]= paste0("'",input[[nam[i]]],"'")
+          names(sets)[i]= nam[i]
+        }
         write(x=paste(names(sets),sets,sep="=",collapse="\n"),
           file=rodeoAppData$fileSettings)
       }
-    }
-  })
+    })
+  }
 
 })
 
