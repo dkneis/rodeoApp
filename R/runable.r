@@ -8,8 +8,12 @@
 #'   of the state variables. Time information (numeric) is expected in the first
 #'   column. Columns with observation data (if existing) must be named like the
 #'   simulated state variables. Missing values must be marked as \code{NA}.
+#' @param serverMode Defaults to \code{FALSE}. If set to \code{TRUE}, data
+#'   required by the GUI are saved to disk only (and the shiny app is
+#'   \emph{not} run).
 #'
-#' @return \code{NULL}
+#' @return \code{NULL} if \code{serverMode} is \code{FALSE} or the
+#'   path/name of the created data file if \code{serverMode} is \code{TRUE}.
 #'
 #' @note The function exports variables to the global environment for
 #'   use by the shiny server and user interface.
@@ -27,30 +31,40 @@
 runGUI= function(
   dir="", xlFile="model.xlsx", funsR="functions.r", funsF="functions.f95",
   tables= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi"),
-  colsep=",", obs=NULL
+  colsep=",", obs=NULL, serverMode=FALSE
 ) {
   dir= normalizePath(dir, winslash="/")
+
   # Run init
   ini= initModel(dir=dir, xlFile=xlFile, funsR=funsR, funsF=funsF,
     tables=tables, colsep=colsep)
-  # Export data to global environment for use in shiny server/ui
-  assign(x="rodeoApp.model", value=ini$model, envir=globalenv())
-  assign(x="rodeoApp.dllfile", value=ini$dllfile, envir=globalenv())
-  assign(x="rodeoApp.funsR", value=ini$funsR, envir=globalenv())
-  assign(x="rodeoApp.vars", value=ini$vars, envir=globalenv())
-  assign(x="rodeoApp.pars", value=ini$pars, envir=globalenv())
-  assign(x="rodeoApp.obs", value=obs, envir=globalenv())
 
-  # Pass the current working directory
-  assign(x="rodeoApp.wd", value=getwd(), envir=globalenv())
-
-  # To save preferences file
-  fileSettings= paste0(dir,"/rodeoApp.savedSettings")
-  assign(x="rodeoApp.fileSettings", value=fileSettings, envir=globalenv())
+  # Save data to file (to be loaded in server/ui)
+  rodeoAppData= list(
+    model= ini$model,
+    dllfile= ini$dllfile,
+    funsR= ini$funsR,
+    vars= ini$vars,
+    pars= ini$pars,
+    obs= obs,
+    serverMode= serverMode,
+    wd= getwd(),
+    fileSettings= paste0(dir,"/rodeoApp.savedSettings"),
+    serverMode=serverMode
+  )
+  # NOTE: File/path name must be consistent with server/ui
+  rodeoAppDataFile= paste0(gsub(pattern="\\", replacement="/", x=tempdir(),
+    fixed=TRUE), "/rodeoAppData.rda")
+  save(rodeoAppData, file=rodeoAppDataFile, ascii=TRUE)
+  rm(rodeoAppData)
 
   # Start shiny app
-  shiny::runApp(system.file("shiny", package="rodeoApp"))
-  return(invisible(NULL))
+  if (serverMode) {
+    return(rodeoAppDataFile)
+  } else {
+    shiny::runApp(system.file("shiny", package="rodeoApp"))
+    return(invisible(NULL))
+  }
 }
 
 

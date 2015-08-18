@@ -6,7 +6,8 @@
 \usage{
 runGUI(dir = "", xlFile = "model.xlsx", funsR = "functions.r",
   funsF = "functions.f95", tables = c(vars = "vars", pars = "pars", funs =
-  "funs", pros = "pros", stoi = "stoi"), colsep = ",", obs = NULL)
+  "funs", pros = "pros", stoi = "stoi"), colsep = ",", obs = NULL,
+  serverMode = FALSE)
 }
 \arguments{
 \item{dir}{Directory where input files are located. This value is added as a
@@ -35,12 +36,16 @@ information.}
   \code{xlFile} is \code{NULL}.}
 
 \item{obs}{If not \code{NULL}, this must be a data frame with observed values
-  of the state variables. Time information (numeric) is expected in the first
-  column. Columns with observation data (if existing) must be named like the
-  simulated state variables. Missing values must be marked as \code{NA}.}
+of the state variables. Time information (numeric) is expected in the first
+column. Columns with observation data (if existing) must be named like the
+simulated state variables. Missing values must be marked as \code{NA}.}
+
+\item{serverMode}{Defaults to \code{FALSE}. If set to \code{TRUE}, data
+  required by the GUI are written to disk only (the shiny app is not run).}
 }
 \value{
-\code{NULL}
+\code{NULL} if \code{serverMode} is \code{FALSE} or the
+  path/name of the created data file if \code{serverMode} is \code{TRUE}.
 }
 \description{
 Runs a rodeo-based model in a shiny GUI to allow for variation of parameters

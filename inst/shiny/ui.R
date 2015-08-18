@@ -1,3 +1,8 @@
+# Load data created by runGUI
+rodeoAppDataFile= paste0(gsub(pattern="\\", replacement="/", x=tempdir(),
+  fixed=TRUE), "/rodeoAppData.rda")
+load(file=rodeoAppDataFile)
+
 ################################################################################
 # Method to generate GUI code
 
@@ -8,9 +13,9 @@ ui_generate= function(vars, pars) {
   newline="\n"
 
   # Settings
-  if (file.exists(get("rodeoApp.fileSettings",envir=globalenv()))) {
+  if (file.exists(rodeoAppData$fileSettings)) {
     tempenv= new.env()
-    sys.source(file=get("rodeoApp.fileSettings",envir=globalenv()), envir=tempenv)
+    sys.source(file=rodeoAppData$fileSettings, envir=tempenv)
     sett= list(
       .time.start= get(".time.start",tempenv),
       .time.end=   get(".time.end",tempenv),
@@ -198,11 +203,17 @@ ui_generate= function(vars, pars) {
 
       # New tab panel
       tabPanel('General settings',
-        fluidRow(
-          column(2, div(style='",labStyle,"',actionButton('saveSettings', label='Save settings'))),
-          column(10, p('",paste0('Target file: ',get('rodeoApp.fileSettings',envir=globalenv())),"'))
+        ",
+        ifelse (rodeoAppData$serverMode,'',
+          paste0("
+          fluidRow(
+            column(2, div(style='",labStyle,"',actionButton('saveSettings', label='Save settings'))),
+            column(10, p('",paste0('Target file: ',rodeoAppData$fileSettings),"'))
+          ),
+          tags$hr(),
+          ")
         ),
-        tags$hr(),
+        "
         fluidRow(
           column(2, p(style='",headStyle,"', 'Simulation time')),
           column(1, div(style='",labStyle,"',textInput('.time.start',label = 'Start', value=",sett$.time.start,"))),
@@ -246,8 +257,7 @@ ui_generate= function(vars, pars) {
 
 
 
-#code= ui_generate(vars=get("rodeoApp.vars",envir=globalenv()),
-#  pars=get("rodeoApp.pars",envir=globalenv()))
+#code= ui_generate(vars=rodeoAppData$vars,  pars=rodeoAppData$pars)
 #f= tempfile()
 #write(x=code, file=gsub(pattern="\\",replacement="/",x=f,fixed=TRUE))
 #cat("written to",f,"\n")
@@ -255,8 +265,5 @@ ui_generate= function(vars, pars) {
 ################################################################################
 # Create and execute GUI code
 
-eval(parse(text=ui_generate(
-  vars=get("rodeoApp.vars",envir=globalenv()),
-  pars=get("rodeoApp.pars",envir=globalenv())
-)))
+eval(parse(text=ui_generate(vars=rodeoAppData$vars, pars=rodeoAppData$pars)))
 

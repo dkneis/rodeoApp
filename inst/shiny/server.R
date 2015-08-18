@@ -1,17 +1,21 @@
+# Load data created by runGUI
+rodeoAppDataFile= paste0(gsub(pattern="\\", replacement="/", x=tempdir(),
+  fixed=TRUE), "/rodeoAppData.rda")
+load(file=rodeoAppDataFile)
 
 # Set working directory
-setwd(get("rodeoApp.wd",envir=globalenv()))
+setwd(rodeoAppData$wd)
 
 # Get info on parameters and variables
 
-par= get("rodeoApp.pars",envir=globalenv())
+par= rodeoAppData$pars
 required= c("name","label","default","user", "html")
 if (!all(required %in% names(par)))
   stop(paste0("incomplete table of parameters; the required columns are: '",
     paste(required,collapse="', '"),"'"))
 par= par[,required]
 
-var= get("rodeoApp.vars",envir=globalenv())
+var= rodeoAppData$vars
 required= c("name","label","default", "html", "tex", "mult", "show", "rtol", "atol", "steady")
 if (!all(required %in% names(var)))
   stop(paste0("incomplete table of variables; the required columns are: '",
@@ -84,18 +88,18 @@ shinyServer(function(input, output) {
     # Steady state simulation
     names_steady= var$name[which(as.logical(var$steady))]
     if (length(names_steady) > 0) {
-      sim= stst(model=get("rodeoApp.model",envir=globalenv()),
+      sim= stst(model=rodeoAppData$model,
         vars=inp$var, pars= inp$par,
-        dllfile=get("rodeoApp.dllfile",envir=globalenv()),
+        dllfile=rodeoAppData$dllfile,
         rtol=setNames(var$rtol, var$name), atol=setNames(var$atol, var$name))
       inp$var[names_steady]= sim$y[names_steady]
     }
     # Dynamic simulation
     t= seq(from=as.numeric(input$.time.start), to=as.numeric(input$.time.end),
       by=as.numeric(input$.time.dt))
-    sim= simul(model=get("rodeoApp.model",envir=globalenv()),
+    sim= simul(model=rodeoAppData$model,
       vars=inp$var, pars= inp$par,
-      times=t, dllfile=get("rodeoApp.dllfile",envir=globalenv()),
+      times=t, dllfile=rodeoAppData$dllfile,
       rtol=setNames(var$rtol, var$name), atol=setNames(var$atol, var$name))
     # Save as reference
     if (input$setRef > buttonCount["setRef"]) {
@@ -108,9 +112,9 @@ shinyServer(function(input, output) {
   # Plot stoichiometry matrix
   output$visStoi <- renderText({
     inp= userData()
-    visStoi(model=get("rodeoApp.model",envir=globalenv()),
+    visStoi(model=rodeoAppData$model,
       vars=inp$var, pars=inp$par,
-      funsR=get("rodeoApp.funsR",envir=globalenv()))
+      funsR=rodeoAppData$funsR)
   })
 
 
@@ -178,7 +182,7 @@ shinyServer(function(input, output) {
       tmax= taxis["center"] + 0.5 * taxis["width"]
 
       plotStates(sim(), sim_ref, input$.time.unit, input$.time.base,
-        model=get("rodeoApp.model",envir=globalenv()),
+        model=rodeoAppData$model,
         mult=userData()$mult, show=userData()$show,
         rangeT=c(tmin,tmax),
         rangeY=c(yaxis["min"], yaxis["max"]),
@@ -187,7 +191,7 @@ shinyServer(function(input, output) {
         logY=input$.yaxis.log,
         labelY=input$.yaxis.label,
         showOld=input$showRef,
-        obs=get("rodeoApp.obs",envir=globalenv()))
+        obs=rodeoAppData$obs)
     }
     # plot to screen
     plt()
@@ -211,8 +215,10 @@ shinyServer(function(input, output) {
         sets[i]= paste0("'",input[[nam[i]]],"'")
         names(sets)[i]= nam[i]
       }
-      write(x=paste(names(sets),sets,sep="=",collapse="\n"),
-        file=get("rodeoApp.fileSettings",envir=globalenv()))
+      if (!rodeoAppData$serverMode) {
+        write(x=paste(names(sets),sets,sep="=",collapse="\n"),
+          file=rodeoAppData$fileSettings)
+      }
     }
   })
 
