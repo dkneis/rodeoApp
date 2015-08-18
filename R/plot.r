@@ -180,12 +180,17 @@ plotStates= function(out, out_old, timeUnit, timeBase,
     return(res)
   }
   # Convert times
-  timeMult= c(seconds=1, hours=3600, days=86400)
+  timeMult= c(seconds=1, hours=3600, days=86400, none=1)
   if (!(timeUnit %in% names(timeMult)))
     stop(paste0("time unit '",timeUnit,"' not supported"))
-  timeBase= as.POSIXct(strptime(timeBase,"%Y-%m-%dT%H:%M:%S"))
+  if (timeUnit == "none") {
+    timeBase= suppressWarnings(as.numeric(timeBase)) # returns NA if date format
+    timeBase= if(is.na(timeBase)) 0 else timeBase
+  } else {
+    timeBase= as.POSIXct(strptime(timeBase,"%Y-%m-%dT%H:%M:%S"))
+  }
   if (!is.finite(timeBase))
-    stop(paste0("base time '",timeBase,"' invalid of mal-formatted"))
+    stop(paste0("base time '",timeBase,"' invalid or mal-formatted"))
   times= timeBase + (out[,1] - out[1,1]) * timeMult[timeUnit]
   rangeT= timeBase + (rangeT - out[1,1]) * timeMult[timeUnit]
   layout(matrix(1:2,ncol=2),widths=c(5,1))
@@ -193,8 +198,12 @@ plotStates= function(out, out_old, timeUnit, timeBase,
   par(mar=c(6,4.1,1.5,0.5), cex=1.25)
   plot(rangeT, rangeY, type="n", log=ifelse(logY,"y",""), xaxt="n",
     xlab="", ylab=labelY)
-  timeTicks= prettyTimes(rangeT[1], rangeT[2], 10)
-  axis.POSIXct(side=1, at=timeTicks$values, format=timeTicks$format, las=2)
+  if (timeUnit == "none") {
+    axis(side=1, las=1)
+  } else {
+    timeTicks= prettyTimes(rangeT[1], rangeT[2], 10)
+    axis.POSIXct(side=1, at=timeTicks$values, format=timeTicks$format, las=2)
+  }
   usr= par("usr")
   rect(xleft=usr[1], xright=usr[2], ybottom=ifelse(logY,10^usr[3],usr[3]),
     ytop=ifelse(logY,10^usr[4],usr[4]), col="grey90")
