@@ -220,7 +220,7 @@ ui_generate= function(vars, pars) {
           column(1, div(style='",labStyle,"',textInput('.time.end', label = 'End', value=",sett$.time.end,"))),
           column(1, div(style='",labStyle,"',textInput('.time.dt', label = 'Step', value=",sett$.time.dt,"))),
           column(1, div(style='",labStyle,"',selectInput('.time.unit', label = 'Unit',
-            choices=c('seconds','hours','days'), selected='",sett$.time.unit,"', multiple=FALSE, selectize=FALSE))),
+            choices=c('seconds','hours','days', 'none'), selected='",sett$.time.unit,"', multiple=FALSE, selectize=FALSE))),
           column(2, div(style='",labStyle,"',textInput('.time.base', label = 'Base (ISO 8601)', value='",sett$.time.base,"')))
         ),
         fluidRow(
@@ -250,7 +250,7 @@ ui_generate= function(vars, pars) {
     ) # End Navbar page
   ) # End shinyUI
   "
-  ) 
+  )
   # --- END OF UI CODE ---
   return(code)
 }
