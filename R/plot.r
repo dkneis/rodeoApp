@@ -180,25 +180,35 @@ plotStates= function(out, out_old, timeUnit, timeBase,
     return(res)
   }
   # Convert times
-  timeMult= c(seconds=1, hours=3600, days=86400, none=1)
+  timeMult= c(Undefined=1, Days=86400, Hours=3600, Seconds=1)
   if (!(timeUnit %in% names(timeMult)))
     stop(paste0("time unit '",timeUnit,"' not supported"))
-  if (timeUnit == "none") {
-    timeBase= suppressWarnings(as.numeric(timeBase)) # returns NA if date format
-    timeBase= if(is.na(timeBase)) 0 else timeBase
+  # Time base and unit specified --> use POSIXct axis; no label required
+  if ((timeBase != "") && (timeUnit != "Undefined")) {
+    timeBase= as.POSIXct(timeBase, tz="UTC")
+    if (!is.finite(timeBase))
+      stop(paste0("base time '",timeBase,"' invalid or mal-formatted"))
+    xlabel= ""
+    numericTimeAxis= FALSE
+  # Either time base or unit not specified --> use a numeric axis; use label
   } else {
-    timeBase= as.POSIXct(strptime(timeBase,"%Y-%m-%dT%H:%M:%S"))
+    timeBase= out[1,1]  # start axis at first time of simulation (numeric)
+    if (timeUnit == "Undefined") {
+      xlabel= "Unspecified time units"
+    } else {
+      xlabel= timeUnit       # only use as label
+      timeUnit= "Undefined"  # but don't use as multiplier
+    }
+    numericTimeAxis= TRUE
   }
-  if (!is.finite(timeBase))
-    stop(paste0("base time '",timeBase,"' invalid or mal-formatted"))
   times= timeBase + (out[,1] - out[1,1]) * timeMult[timeUnit]
   rangeT= timeBase + (rangeT - out[1,1]) * timeMult[timeUnit]
   layout(matrix(1:2,ncol=2),widths=c(5,1))
   opar=par(c("mar", "cex"))
   par(mar=c(6,4.1,1.5,0.5), cex=1.25)
   plot(rangeT, rangeY, type="n", log=ifelse(logY,"y",""), xaxt="n",
-    xlab="", ylab=labelY)
-  if (timeUnit == "none") {
+    xlab=xlabel, ylab=labelY)
+  if (numericTimeAxis) {
     axis(side=1, las=1)
   } else {
     timeTicks= prettyTimes(rangeT[1], rangeT[2], 10)

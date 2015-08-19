@@ -40,8 +40,8 @@ ui_generate= function(vars, pars) {
       .time.start=0,
       .time.end=10,
       .time.dt=1,
-      .time.base="1970-01-01T00:00:00",
-      .time.unit="seconds",
+      .time.base="",
+      .time.unit="Undefined",
       .taxis.center=NA,
       .taxis.width=NA,
       .taxis.grid=FALSE,
@@ -213,19 +213,22 @@ ui_generate= function(vars, pars) {
           column(2, p(style='",headStyle,"', 'Simulation time')),
           column(1, div(style='",labStyle,"',textInput('.time.start',label = 'Start', value=",sett$.time.start,"))),
           column(1, div(style='",labStyle,"',textInput('.time.end', label = 'End', value=",sett$.time.end,"))),
-          column(1, div(style='",labStyle,"',textInput('.time.dt', label = 'Step', value=",sett$.time.dt,"))),
-          column(1, div(style='",labStyle,"',selectInput('.time.unit', label = 'Unit',
-            choices=c('seconds','hours','days', 'none'), selected='",sett$.time.unit,"', multiple=FALSE, selectize=FALSE))),
-          column(2, div(style='",labStyle,"',textInput('.time.base', label = 'Base (ISO 8601)', value='",sett$.time.base,"')))
+          column(1, div(style='",labStyle,"',textInput('.time.dt', label = 'Step', value=",sett$.time.dt,")))
         ),
         fluidRow(
-          column(2, p(style='",headStyle,"', 'Time axis (init.)')),
+          column(2, p(style='",headStyle,"', 'Time axis format')),
+          column(2, div(style='",labStyle,"',selectInput('.time.unit', label = 'Unit of \\\'Step\\\'',
+            choices=c('Undefined','Days','Hours','Seconds'), selected='",sett$.time.unit,"', multiple=FALSE, selectize=FALSE))),
+          column(4, div(style='",labStyle,"',textInput('.time.base', label = 'Date/time of \\\'Start\\\' (ISO 8601); or leave blank', value='",sett$.time.base,"')))
+        ),
+        fluidRow(
+          column(2, p(style='",headStyle,"', 'Time axis initial view')),
           column(1, div(style='",labStyle,"',textInput('.taxis.center', label = 'Center', value=",sett$.taxis.center,"))),
           column(1, div(style='",labStyle,"',textInput('.taxis.width', label = 'Width', value=",sett$.taxis.width,"))),
           column(1, div(style='",labStyle,"',checkboxInput('.taxis.grid', label='Grid', value=",sett$.taxis.grid,")))
         ),
         fluidRow(
-          column(2, p(style='",headStyle,"', 'Y axis')),
+          column(2, p(style='",headStyle,"', 'Y axis initial view')),
           column(1, div(style='",labStyle,"',textInput('.yaxis.min', label = 'Min.', value=",sett$.yaxis.min,"))),
           column(1, div(style='",labStyle,"',textInput('.yaxis.max', label = 'Max.', value=",sett$.yaxis.max,"))),
           column(1, div(style='",labStyle,"',checkboxInput('.yaxis.grid', label='Grid', value=",sett$.yaxis.grid,"))),
@@ -233,7 +236,7 @@ ui_generate= function(vars, pars) {
           column(1, div(style='",labStyle,"',textInput('.yaxis.label', label = 'Label', value='",sett$.yaxis.label,"')))
         ),
         fluidRow(
-          column(2, p(style='",headStyle,"', 'Saved images (.png)')),
+          column(2, p(style='",headStyle,"', 'Download of images')),
           column(1, div(style='",labStyle,"',textInput('.png.width', label = 'Width (px)', value=",sett$.png.width,"))),
           column(1, div(style='",labStyle,"',textInput('.png.height', label = 'Height (px)', value=",sett$.png.height,"))),
           column(1, div(style='",labStyle,"',textInput('.png.res', label = 'Resol. (dpi)', value=",sett$.png.res,")))
