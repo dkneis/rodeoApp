@@ -47,8 +47,8 @@ yaxis= c(min= NA, max= NA)
 # Define server
 shinyServer(function(input, output) {
 
-  # Set parameters and variables (--> items depend on the loaded model)
-  userData= reactive({
+  # Get parameters and variables (--> items depend on the loaded model)
+  userPars= reactive({
     currentPar= data.frame(name=par$name, value=par$default, stringsAsFactors=FALSE)
     for (i in 1:nrow(currentPar)) {
       pos= match(currentPar$name[i], names(input))
@@ -56,35 +56,44 @@ shinyServer(function(input, output) {
         currentPar$value[i]= input[[names(input)[pos]]]
       }
     }
-    currentVar= data.frame(name=var$name, value=var$default,
-      mult=var$mult,
-      show=as.logical(var$show),
-      stringsAsFactors=FALSE)
+    return(setNames(as.numeric(currentPar$value), currentPar$name))
+  })
+  userVars= reactive({
+    currentVar= data.frame(name=var$name, value=var$default, stringsAsFactors=FALSE)
     for (i in 1:nrow(currentVar)) {
       pos= match(currentVar$name[i], names(input))
       if (!is.na(pos)) {
         currentVar$value[i]= input[[names(input)[pos]]]
       }
-      pos= match(paste0(currentVar$name[i],".mult"), names(input))
-      if (!is.na(pos)) {
-        currentVar$mult[i]= input[[names(input)[pos]]]
-      }
+    }
+    return(setNames(as.numeric(currentVar$value), currentVar$name))
+  })
+
+  # Get options for plotting of variables (--> items depend on the loaded model)
+  showVars= reactive({
+    currentVar= data.frame(name=var$name, show=as.logical(var$show), stringsAsFactors=FALSE)
+    for (i in 1:nrow(currentVar)) {
       pos= match(paste0(currentVar$name[i],".show"), names(input))
       if (!is.na(pos)) {
         currentVar$show[i]= input[[names(input)[pos]]]
       }
     }
-    return(list(
-      par=setNames(as.numeric(currentPar$value), currentPar$name),
-      var=setNames(as.numeric(currentVar$value), currentVar$name),
-      mult=setNames(as.numeric(currentVar$mult), currentVar$name),
-      show=setNames(as.logical(currentVar$show), currentVar$name)
-    ))
+    return(setNames(as.logical(currentVar$show), currentVar$name))
+  })
+  multVars= reactive({
+    currentVar= data.frame(name=var$name, mult=var$mult, stringsAsFactors=FALSE)
+    for (i in 1:nrow(currentVar)) {
+      pos= match(paste0(currentVar$name[i],".mult"), names(input))
+      if (!is.na(pos)) {
+        currentVar$mult[i]= input[[names(input)[pos]]]
+      }
+    }
+    return(setNames(as.numeric(currentVar$mult), currentVar$name))
   })
 
   # Carry out a simulation run
   sim= reactive({
-    inp= userData()
+    inp= list(var=userVars(), par=userPars())
     # Steady state simulation
     names_steady= var$name[which(as.logical(var$steady))]
     if (length(names_steady) > 0) {
@@ -111,15 +120,14 @@ shinyServer(function(input, output) {
 
   # Plot stoichiometry matrix
   output$visStoi <- renderText({
-    inp= userData()
     visStoi(model=rodeoAppData$model,
-      vars=inp$var, pars=inp$par,
+      vars=userVars(), pars=userPars(),
       funsR=rodeoAppData$funsR)
   })
 
-
-  # Plot state variables
-  output$plotStates <- renderPlot({
+  # Update axis definitions
+  # Note: We need to manipulate global values to make zooming etc. reversible
+  updateAxDefs= reactive({
     # Observe state of interactive time scrolling/zooming
     if (input$tReset > buttonCount["tReset"]) {
       buttonCount["tReset"] <<- input$tReset
@@ -175,35 +183,50 @@ shinyServer(function(input, output) {
       buttonCount["yZoomOut"] <<- input$yZoomOut
       yaxis["max"] <<- yaxis["max"] + 0.2 * (yaxis["max"] - yaxis["min"])
     }
-
-    # Graphics
-    plt= function() {
-      tmin= taxis["center"] - 0.5 * taxis["width"]
-      tmax= taxis["center"] + 0.5 * taxis["width"]
-
-      plotStates(sim(), sim_ref, input$.time.unit, input$.time.base,
-        model=rodeoAppData$model,
-        mult=userData()$mult, show=userData()$show,
-        rangeT=c(tmin,tmax),
-        rangeY=c(yaxis["min"], yaxis["max"]),
-        gridT=input$.taxis.grid,
-        gridY=input$.yaxis.grid,
-        logY=input$.yaxis.log,
-        labelY=input$.yaxis.label,
-        showOld=input$showRef,
-        obs=rodeoAppData$obs)
-    }
-    # plot to screen
-    plt()
-    # plot to file
-    if (input$saveImage > buttonCount["saveImage"]) {
-      buttonCount["saveImage"] <<- input$saveImage
-      plotPNG(func=plt, filename=paste0(input$.png.dir,"/",
-        format(Sys.time(),"%Y-%m-%dT%H%M%S"),".png"),
-        width=as.numeric(input$.png.width), height=as.numeric(input$.png.height),
-        res=as.numeric(input$.png.res))
-    }
+    return(list(
+      taxis=c(min=taxis[["center"]] - 0.5 * taxis[["width"]],
+              max=taxis[["center"]] + 0.5 * taxis[["width"]]),
+      yaxis=c(min=yaxis[["min"]], max=yaxis[["max"]])
+    ))
   })
+
+
+  # Plot state variables
+  output$plotStates <- renderPlot({
+    axDefs= updateAxDefs()
+    plotStates(sim(), sim_ref, input$.time.unit, input$.time.base,
+      model=rodeoAppData$model,
+      mult=multVars(), show=showVars(),
+      rangeT=c(axDefs$taxis["min"], axDefs$taxis["max"]),
+      rangeY=c(axDefs$yaxis["min"], axDefs$yaxis["max"]),
+      gridT=input$.taxis.grid, gridY=input$.yaxis.grid, logY=input$.yaxis.log,
+      labelY=input$.yaxis.label, showOld=input$showRef, obs=rodeoAppData$obs
+    )
+  })
+
+  # Download handler
+  output$saveImage <- downloadHandler(
+    # Function returning a file name
+    filename = function() {
+		  paste0("rodeoAppImage_",format(Sys.time(),"%Y-%m-%dT%H%M%S"),".png")
+	  },
+    # Function writing data to its argument 'file'
+    content = function(file) {
+      tmpFun= function() {
+        axDefs= updateAxDefs()
+        plotStates(sim(), sim_ref, input$.time.unit, input$.time.base,
+          model=rodeoAppData$model,
+          mult=multVars(), show=showVars(),
+          rangeT=c(axDefs$taxis["min"], axDefs$taxis["max"]),
+          rangeY=c(axDefs$yaxis["min"], axDefs$yaxis["max"]),
+          gridT=input$.taxis.grid, gridY=input$.yaxis.grid, logY=input$.yaxis.log,
+          labelY=input$.yaxis.label, showOld=input$showRef, obs=rodeoAppData$obs
+        )
+      }
+      plotPNG(func=tmpFun, filename=file, width=as.numeric(input$.png.width),
+        height=as.numeric(input$.png.height), res=as.numeric(input$.png.res))
+    }
+  )
 
   # Save settings on request
   if (!rodeoAppData$serverMode) {

@@ -32,12 +32,8 @@ ui_generate= function(vars, pars) {
       .yaxis.label=  get(".yaxis.label",tempenv),
       .png.width=  get(".png.width",tempenv),
       .png.height= get(".png.height",tempenv),
-      .png.res=    get(".png.res",tempenv),
-      .png.dir=   get(".png.dir",tempenv)
+      .png.res=    get(".png.res",tempenv)
     )
-    # handle case of non-existing directory (e.g. after re-start of R)
-    if (!dir.exists(sett$.png.dir))
-      sett$.png.dir=gsub(pattern="\\", replacement="/", x=tempdir(), fixed=TRUE)
     rm(tempenv)
   } else {
     sett= list(
@@ -56,8 +52,7 @@ ui_generate= function(vars, pars) {
       .yaxis.label="State variable(s)",
       .png.width=1200,
       .png.height=800,
-      .png.res=150,
-      .png.dir=gsub(pattern="\\", replacement="/", x=tempdir(), fixed=TRUE)
+      .png.res=150
     )
   }
 
@@ -149,7 +144,7 @@ ui_generate= function(vars, pars) {
           column(3, p('')),
           column(2, div(style='",labStyle,"',actionButton('setRef', label='Set as reference'))),
           column(2, div(style='",labStyle,"',checkboxInput('showRef', label='Show reference', value = FALSE))),
-          column(2, div(style='",labStyle,"',actionButton('saveImage', label='Save image')))
+          column(2, div(style='",labStyle,"',downloadButton('saveImage', label='Save image')))
         ),
         fluidRow(
           column(1,style = 'overflow-y:scroll; max-height: 800px',
@@ -241,8 +236,7 @@ ui_generate= function(vars, pars) {
           column(2, p(style='",headStyle,"', 'Saved images (.png)')),
           column(1, div(style='",labStyle,"',textInput('.png.width', label = 'Width (px)', value=",sett$.png.width,"))),
           column(1, div(style='",labStyle,"',textInput('.png.height', label = 'Height (px)', value=",sett$.png.height,"))),
-          column(1, div(style='",labStyle,"',textInput('.png.res', label = 'Resol. (dpi)', value=",sett$.png.res,"))),
-          column(3, div(style='",labStyle,"',textInput('.png.dir', label = 'Output folder', value='",sett$.png.dir,"')))
+          column(1, div(style='",labStyle,"',textInput('.png.res', label = 'Resol. (dpi)', value=",sett$.png.res,")))
         )
 
       ) # End tabPanel
