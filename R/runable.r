@@ -42,14 +42,14 @@ runGUI= function(
   # Save data to file (to be loaded in server/ui)
   rodeoAppData= list(
     model= ini$model,
-    dllfile= ini$dllfile,
-    funsR= ini$funsR,
+    dllfile= ifelse(serverMode, basename(ini$dllfile), ini$dllfile),
+    funsR= ifelse(serverMode, basename(ini$funsR), ini$funsR),
     vars= ini$vars,
     pars= ini$pars,
     obs= obs,
-    serverMode= serverMode,
-    wd= getwd(),
-    fileSettings= paste0(dir,"/rodeoApp.savedSettings"),
+    wd= ifelse(serverMode,".",getwd()),
+    fileSettings= ifelse(serverMode, "rodeoApp.savedSettings",
+      paste0(dir,"/rodeoApp.savedSettings")),
     serverMode=serverMode
   )
   # NOTE: File/path name must be consistent with server/ui

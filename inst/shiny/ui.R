@@ -1,6 +1,10 @@
 # Load data created by runGUI
 rodeoAppDataFile= paste0(gsub(pattern="\\", replacement="/", x=tempdir(),
   fixed=TRUE), "/rodeoAppData.rda")
+if (!file.exists(rodeoAppDataFile))
+  rodeoAppDataFile= "rodeoAppData.rda"
+if (!file.exists(rodeoAppDataFile))
+  stop("startup data file not found")
 load(file=rodeoAppDataFile)
 
 ################################################################################
