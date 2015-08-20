@@ -39,6 +39,16 @@ runGUI= function(
   ini= initModel(dir=dir, xlFile=xlFile, funsR=funsR, funsF=funsF,
     tables=tables, colsep=colsep)
 
+  if (serverMode) {
+    dirSettings= "."  # button to save files not available anyway
+  } else {
+    if (as.integer(file.access(dir, mode = 2)) == 0) {
+      dirSettings= dir           # if model folder is writeable
+    } else {
+      dirSettings= getwd()       # otherwise
+    }
+  }
+
   # Save data to file (to be loaded in server/ui)
   rodeoAppData= list(
     model= ini$model,
@@ -48,8 +58,7 @@ runGUI= function(
     pars= ini$pars,
     obs= obs,
     wd= ifelse(serverMode,".",getwd()),
-    fileSettings= ifelse(serverMode, "rodeoApp.savedSettings",
-      paste0(dir,"/rodeoApp.savedSettings")),
+    fileSettings= paste0(dirSettings,"/rodeoApp.savedSettings"),
     serverMode=serverMode
   )
   # NOTE: File/path name must be consistent with server/ui
