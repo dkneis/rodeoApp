@@ -209,6 +209,7 @@ plotStates= function(out, out_old, timeUnit, timeBase,
   plot(rangeT, rangeY, type="n", log=ifelse(logY,"y",""), xaxt="n",
     xlab=xlabel, ylab=labelY)
   if (numericTimeAxis) {
+    timeTicks= list(values=axTicks(side=1))
     axis(side=1, las=1)
   } else {
     timeTicks= prettyTimes(rangeT[1], rangeT[2], 10)
