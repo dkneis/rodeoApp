@@ -1,11 +1,16 @@
 # Load data created by runGUI
-rodeoAppDataFile= paste0(gsub(pattern="\\", replacement="/", x=tempdir(),
-  fixed=TRUE), "/rodeoAppData.rda")
-if (!file.exists(rodeoAppDataFile))
-  rodeoAppDataFile= "rodeoAppData.rda"
-if (!file.exists(rodeoAppDataFile))
-  stop("startup data file not found")
-load(file=rodeoAppDataFile)
+dirs= c(".",gsub(pattern="\\", replacement="/", x=tempdir(), fixed=TRUE))
+loaded= FALSE
+for (d in dirs) {
+  if (file.exists(paste0(d,"/rodeoAppData.rda"))) {
+    load(file=paste0(d,"/rodeoAppData.rda"))
+    loaded= TRUE
+    break
+  }
+}
+if (!loaded)
+  stop(paste0("startup data not found in folder(s): '",
+    paste(dirs,collapse="', '"),"'"))
 
 ################################################################################
 # Method to generate GUI code
