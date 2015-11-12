@@ -69,7 +69,7 @@ initModel= function(
   if (!is.null(xlFile)) {
     xlFile= paste(dir,xlFile,sep="/")
     if (!file.exists(xlFile))
-      stop("file with model definition not found ('",xlFile,"')")
+      stop(paste0("file with model definition not found ('",xlFile,"')"))
     for (i in 1:length(tables)) {
       tryCatch({
         tmp= read_excel(path=xlFile, sheet=tables[i], col_names= TRUE,
@@ -127,7 +127,7 @@ generateLib= function(model, source_f_fun) {
   write(x=code, file=source_f_gen)
 #  cat("code written to",source_f_gen)
   # Create wrapper code for compatibility with deSolve; single spatial level
-  code= fortranWrapper_deSolve(1)
+  code= fortranWrapper_deSolve(1, "derivs")
   source_f_wrp= gsub(pattern="\\", replacement="/",
     x=paste0(tempfile(), ".f95"), fixed=TRUE)
   write(x=code, file=source_f_wrp)
