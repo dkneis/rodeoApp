@@ -127,7 +127,7 @@ generateLib= function(model, source_f_fun) {
   write(x=code, file=source_f_gen)
 #  cat("code written to",source_f_gen)
   # Create wrapper code for compatibility with deSolve; single spatial level
-  code= fortranWrapper_deSolve(1, "derivs")
+  code= solverInterface(1, "derivs")
   source_f_wrp= gsub(pattern="\\", replacement="/",
     x=paste0(tempfile(), ".f95"), fixed=TRUE)
   write(x=code, file=source_f_wrp)
