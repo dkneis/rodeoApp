@@ -20,7 +20,7 @@ visStoi= function(model, vars, pars, funsR) {
     if (as.numeric(x) < 0) return("<span style='color: #5684C1;'>&nabla;</span>") #return("&#9661;")
     return("") #return("&empty;")
   }
-  m= model$stoichiometryMatrix(c(vars, pars))
+  m= model$stoichiometry(c(vars, pars))
   tbl= cbind(data.frame(process=rownames(m), stringsAsFactors=FALSE), as.data.frame(m))
   html= exportDF(x=tbl, tex=FALSE,
     colnames= setNames(c("Process",model$getVars()$html[match(colnames(m),
