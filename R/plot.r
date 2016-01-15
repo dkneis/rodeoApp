@@ -238,7 +238,8 @@ plotStates= function(out, out_old, timeUnit, timeBase,
     if (show[varname]) {
       lines(times, out[,1+i]*mult[varname], lty=i, lwd=2, col=clr(i))
       if ((!is.null(obs)) && (varname %in% names(obs))) {
-        points(obs[,1], obs[,varname]*mult[varname], pch=i, col=clr(i))
+        timesObs= timeBase + (obs[,1] - out[1,1]) * timeMult[timeUnit]
+        points(timesObs, obs[,varname]*mult[varname], pch=i, col=clr(i))
       }
     }
   }
