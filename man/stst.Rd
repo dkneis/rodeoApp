@@ -4,7 +4,7 @@
 \alias{stst}
 \title{Compute steady-state solution}
 \usage{
-stst(model, vars, pars, dllfile, rtol, atol)
+stst(model, vars, pars, time, dllfile, rtol, atol)
 }
 \arguments{
 \item{model}{Object of class \code{rodeo} representing the model.}
@@ -12,6 +12,11 @@ stst(model, vars, pars, dllfile, rtol, atol)
 \item{vars}{Named vector of the state variables' initial values.}
 
 \item{pars}{Named vector of parameters.}
+
+\item{time}{Scalar numeric value. All external forcings used in the steady
+  state computations are kept constant at their respective values for the
+  given point in time. If no external forcings are present (autonomous
+  models), the value is ignored.}
 
 \item{dllfile}{Shared library file holding the compiled model.}
 

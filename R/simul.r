@@ -48,6 +48,11 @@ simul= function(model, vars, pars, times, dllfile, rtol, atol) {
 #'
 #' Estimates the values of the state variables for steady-state conditions.
 #'
+#' @param time Scalar numeric value. All external forcings used in the steady
+#'   state computations are kept constant at their respective values for the
+#'   given point in time. If no external forcings are present (autonomous
+#'   models), the value is ignored.
+#'
 #' @inheritParams simul
 #'
 #' @return The object returned by \code{rootSolve::steady}. The \code{y}-
@@ -59,7 +64,7 @@ simul= function(model, vars, pars, times, dllfile, rtol, atol) {
 #' @author David Kneis \email{david.kneis@@tu-dresden.de}
 #'
 #' @export
-stst= function(model, vars, pars, dllfile, rtol, atol) {
+stst= function(model, vars, pars, time, dllfile, rtol, atol) {
   # Transform input data
   vars= model$arrangeVars(as.list(vars))
   pars= model$arrangePars(as.list(pars))
@@ -72,8 +77,8 @@ stst= function(model, vars, pars, dllfile, rtol, atol) {
     x=basename(dllfile))
   dyn.load(dllfile)
   # Compute steady state solution
-  out= rootSolve::steady(y=vars, time=NULL, func="derivs_wrapped", parms=pars,
-    method="runsteady", dllname=dllname, initfunc="initmod",
+  out= rootSolve::steady(y=vars, time=time, func="derivs_wrapped", parms=pars,
+    method="stode", dllname=dllname, initfunc="initmod",
     nout=model$lenPros(), outnames=model$namesPros())
   if (!attr(out, which="steady",exact=TRUE))
     stop(paste0("Steady-state estimation failed.\n----- The initial values were:\n",
