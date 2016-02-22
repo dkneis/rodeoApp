@@ -133,7 +133,7 @@ generateLib= function(model, source_f_fun) {
   write(x=code, file=source_f_wrp)
 #  cat("code written to",source_f_wrp)
   # Compile code
-  dllname= "mySharedLib"
+  dllname= basename(tempfile())
   dllfile= paste0(gsub(pattern="\\", replacement="/",
     x=tempdir(), fixed=TRUE),"/",dllname,.Platform$dynlib.ext)
   if (file.exists(dllfile))
