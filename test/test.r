@@ -26,6 +26,7 @@ runGUI(dir="Model_external_2")
 
 #runGUI(dir="/home/dkneis/tudd/dynaTrait/claudia")
 
+#runGUI(dir="/home/dkneis/tudd/dev/r_packages/rodeoApp/inst/examples/chemostat")
 
 #library(rodeoApp)
 #runMCS(
