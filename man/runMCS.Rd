@@ -44,7 +44,7 @@ interpreted as the names of delimited text files holding the respective
 information.}
 
 \item{colsep}{Specifies the column separator in text files. Only used if
-  \code{xlFile} is \code{NULL}.}
+\code{xlFile} is \code{NULL}.}
 
 \item{silent}{Logical. Used to switch diagnostic messages on/off.}
 }

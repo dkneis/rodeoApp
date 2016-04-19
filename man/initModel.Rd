@@ -6,7 +6,7 @@
 \usage{
 initModel(dir = "", xlFile = "model.xlsx", funsR = "functions.r",
   funsF = "functions.f95", tables = c(vars = "vars", pars = "pars", funs =
-  "funs", pros = "pros", stoi = "stoi"), colsep = ",")
+  "funs", pros = "pros", stoi = "stoi"), colsep = ",", dllname = NULL)
 }
 \arguments{
 \item{dir}{Directory where input files are located. This value is added as a
@@ -32,13 +32,20 @@ interpreted as the names of delimited text files holding the respective
 information.}
 
 \item{colsep}{Specifies the column separator in text files. Only used if
-  \code{xlFile} is \code{NULL}.}
+\code{xlFile} is \code{NULL}.}
+
+\item{dllname}{Character string used as the name for the built library. This
+  is the base name without file extension (must not contain path separators,
+  white space, etc.). If set to \code{NULL} (the default), an automatic
+  name is assigned. The library is created in the folder returned by
+  \code{tempdir()} and it carries the system-specific extension for shared
+  libraries according to \code{.Platform$dynlib.ext}.}
 }
 \value{
 A list with the following components.
 \itemize{
   \item{\code{model} : } Object of class \code{rodeo} representing the model.
-  \item{\code{dllfile} : } Shared library with compiled Fortran code.
+  \item{\code{dllfile} : } File path of library with compiled Fortran code.
   \item{\code{funsR} : } Full name of the file with R functions.
   \item{\code{vars} : } Data frame with variable declarations.
   \item{\code{pars} : } Data frame with parameter declarations.
