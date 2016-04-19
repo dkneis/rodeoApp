@@ -7,7 +7,7 @@
 runGUI(dir = "", xlFile = "model.xlsx", funsR = "functions.r",
   funsF = "functions.f95", tables = c(vars = "vars", pars = "pars", funs =
   "funs", pros = "pros", stoi = "stoi"), colsep = ",", obs = NULL,
-  serverMode = FALSE)
+  dllname = NULL, serverMode = FALSE)
 }
 \arguments{
 \item{dir}{Directory where input files are located. This value is added as a
@@ -33,28 +33,38 @@ interpreted as the names of delimited text files holding the respective
 information.}
 
 \item{colsep}{Specifies the column separator in text files. Only used if
-  \code{xlFile} is \code{NULL}.}
+\code{xlFile} is \code{NULL}.}
 
 \item{obs}{If not \code{NULL}, this must be a data frame with observed values
 of the state variables. Time information (numeric) is expected in the first
 column. Columns with observation data (if existing) must be named like the
 simulated state variables. Missing values must be marked as \code{NA}.}
 
+\item{dllname}{Character string used as the name for the built library. This
+  is the base name without file extension (must not contain path separators,
+  white space, etc.). If set to \code{NULL} (the default), an automatic
+  name is assigned. The library is created in the folder returned by
+  \code{tempdir()} and it carries the system-specific extension for shared
+  libraries according to \code{.Platform$dynlib.ext}.}
+
 \item{serverMode}{Defaults to \code{FALSE}. If set to \code{TRUE}, data
-  required by the GUI are saved to disk only (and the shiny app is
-  \emph{not} run).}
+  required by the GUI are saved to disk but the shiny app is
+  \emph{not} run.}
 }
 \value{
-\code{NULL} if \code{serverMode} is \code{FALSE} or the
-  path/name of the created data file if \code{serverMode} is \code{TRUE}.
+If \code{serverMode} is \code{FALSE}, the function returns
+  \code{NULL}. Otherwise it returns a vector holding the names of 3
+  files needed to run the GUI. These files carry the extension .r, .rda, and
+  .so or .dll, respectively. They reside in the current working directory.
 }
 \description{
 Runs a rodeo-based model in a shiny GUI to allow for variation of parameters
 and/or initial values.
 }
 \note{
-The function exports variables to the global environment for
-  use by the shiny server and user interface.
+Existing files are not overwritten unless they reside in R's temporary
+  folder. Thus, manual file deletion may be necessary when \code{serverMode}
+  is \code{TRUE}.
 }
 \examples{
 \dontrun{

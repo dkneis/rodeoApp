@@ -16,13 +16,15 @@ if (!("rodeoApp" %in% installed.packages()[,1]))
 install_github("dkneis/rodeoApp")
 library("rodeoApp")
 
-setwd("/home/dkneis/tudd/lehre/HSE")
-runGUI(dir="Model_external_2")
+#setwd("/home/dkneis/tudd/lehre/HSE")
+#runGUI(dir="Model_external_2")
 
 #obs= data.frame(1:5, T=seq(1, 1e9, length.out=5))
 #runGUI(dir=system.file("examples/DRT", package="rodeoApp"), obs=obs)
 
-#runGUI(dir=system.file("examples/DRT", package="rodeoApp"))
+runGUI(dir=system.file("examples/DRT", package="rodeoApp"))
+
+#runGUI(dir=system.file("examples/DRT", package="rodeoApp"), dllname="myLib", serverMode=TRUE)
 
 #runGUI(dir="/home/dkneis/tudd/dynaTrait/claudia")
 

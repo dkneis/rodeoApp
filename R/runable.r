@@ -9,16 +9,19 @@
 #'   column. Columns with observation data (if existing) must be named like the
 #'   simulated state variables. Missing values must be marked as \code{NA}.
 #' @param serverMode Defaults to \code{FALSE}. If set to \code{TRUE}, data
-#'   required by the GUI are saved to disk only (and the shiny app is
-#'   \emph{not} run).
+#'   required by the GUI are saved to disk but the shiny app is
+#'   \emph{not} run.
 #'
-#' @return \code{NULL} if \code{serverMode} is \code{FALSE} or the
-#'   path/name of the created data file if \code{serverMode} is \code{TRUE}.
-#'
-#' @note The function exports variables to the global environment for
-#'   use by the shiny server and user interface.
+#' @return If \code{serverMode} is \code{FALSE}, the function returns
+#'   \code{NULL}. Otherwise it returns a vector holding the names of 3
+#'   files needed to run the GUI. These files carry the extension .r, .rda, and
+#'   .so or .dll, respectively. They reside in the current working directory.
 #'
 #' @author David Kneis \email{david.kneis@@tu-dresden.de}
+#'
+#' @note Existing files are not overwritten unless they reside in R's temporary
+#'   folder. Thus, manual file deletion may be necessary when \code{serverMode}
+#'   is \code{TRUE}.
 #'
 #' @export
 #'
@@ -31,13 +34,13 @@
 runGUI= function(
   dir="", xlFile="model.xlsx", funsR="functions.r", funsF="functions.f95",
   tables= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi"),
-  colsep=",", obs=NULL, serverMode=FALSE
+  colsep=",", obs=NULL, dllname=NULL, serverMode=FALSE
 ) {
   dir= normalizePath(dir, winslash="/")
 
   # Run init
   ini= initModel(dir=dir, xlFile=xlFile, funsR=funsR, funsF=funsF,
-    tables=tables, colsep=colsep)
+    tables=tables, colsep=colsep, dllname=dllname)
 
   if (serverMode) {
     dirSettings= "."  # button to save files not available anyway
@@ -52,8 +55,8 @@ runGUI= function(
   # Save data to file (to be loaded in server/ui)
   rodeoAppData= list(
     model= ini$model,
-    dllfile= ifelse(serverMode, basename(ini$dllfile), ini$dllfile),
-    funsR= ifelse(serverMode, basename(ini$funsR), ini$funsR),
+    dllfile= if (serverMode) basename(ini$dllfile) else ini$dllfile,
+    funsR= if (serverMode) basename(ini$funsR) else ini$funsR,
     vars= ini$vars,
     pars= ini$pars,
     obs= obs,
@@ -65,12 +68,20 @@ runGUI= function(
   rodeoAppDataFile= paste0(gsub(pattern="\\", replacement="/", x=tempdir(),
     fixed=TRUE), "/rodeoAppData.rda")
   save(rodeoAppData, file=rodeoAppDataFile, ascii=TRUE)
-  rm(rodeoAppData)
 
   # Start shiny app
   if (serverMode) {
-    return(rodeoAppDataFile)
+    src= c(rodeoAppDataFile, rodeoAppData[["dllfile"]], rodeoAppData[["funsR"]])
+    tar= basename(src)
+    bad= tar[file.exists(tar)]
+    if (length(bad) > 0)
+      stop("unwilling to overwrite existing file(s) '",
+        paste(bad, collapse="', '"),"'")
+    file.copy(from=src, to=".")
+    rm(rodeoAppData)
+    return(tar)
   } else {
+    rm(rodeoAppData)
     shiny::runApp(system.file("shiny", package="rodeoApp"))
     return(invisible(NULL))
   }

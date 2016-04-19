@@ -24,11 +24,17 @@
 #'   information.
 #' @param colsep Specifies the column separator in text files. Only used if
 #'   \code{xlFile} is \code{NULL}.
+#' @param dllname Character string used as the name for the built library. This
+#'   is the base name without file extension (must not contain path separators,
+#'   white space, etc.). If set to \code{NULL} (the default), an automatic
+#'   name is assigned. The library is created in the folder returned by
+#'   \code{tempdir()} and it carries the system-specific extension for shared
+#'   libraries according to \code{.Platform$dynlib.ext}.
 #'
 #' @return A list with the following components.
 #' \itemize{
 #'   \item{\code{model} : } Object of class \code{rodeo} representing the model.
-#'   \item{\code{dllfile} : } Shared library with compiled Fortran code.
+#'   \item{\code{dllfile} : } File path of library with compiled Fortran code.
 #'   \item{\code{funsR} : } Full name of the file with R functions.
 #'   \item{\code{vars} : } Data frame with variable declarations.
 #'   \item{\code{pars} : } Data frame with parameter declarations.
@@ -48,7 +54,7 @@
 initModel= function(
   dir="", xlFile="model.xlsx", funsR="functions.r", funsF="functions.f95",
   tables= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi"),
-  colsep=","
+  colsep=",", dllname=NULL
 ) {
   # Set/check file names
   funsR= paste(dir,funsR,sep="/")
@@ -105,7 +111,7 @@ initModel= function(
   model= new("rodeo", vars=tbl$vars, pars=tbl$pars, funs=tbl$funs,
     pros=tbl$pros, stoi=tbl$stoi)
   # Generate shared lib
-  dllfile= generateLib(model=model, source_f_fun=funsF)
+  dllfile= generateLib(model=model, source_f_fun=funsF, dllname=dllname)
   # Return
   return(list(model=model, dllfile=dllfile, funsR=funsR,
     vars=tbl$vars, pars=tbl$pars))
@@ -116,10 +122,15 @@ initModel= function(
 # Inputs
 #   model: rodeo object
 #   source_f_fun: function definitions in Fortran
+#   dllname: name of the library to be generated (basename without extension)
 # Returns
 #   File name of the generated shared library
 
-generateLib= function(model, source_f_fun) {
+generateLib= function(model, source_f_fun, dllname=NULL) {
+  # Expand file path
+  source_f_fun= normalizePath(source_f_fun, winslash="/")
+  # Get name of temporary folder
+  tmpdir= gsub(pattern="\\", replacement="/", x=tempdir(), fixed=TRUE)
   # Generate code to compute derivatives
   code= model$generate(name="derivs",lang="f95")
   source_f_gen= gsub(pattern="\\", replacement="/",
@@ -132,17 +143,20 @@ generateLib= function(model, source_f_fun) {
     x=paste0(tempfile(), ".f95"), fixed=TRUE)
   write(x=code, file=source_f_wrp)
 #  cat("code written to",source_f_wrp)
-  # Compile code
-  dllname= basename(tempfile())
-  dllfile= paste0(gsub(pattern="\\", replacement="/",
-    x=tempdir(), fixed=TRUE),"/",dllname,.Platform$dynlib.ext)
+  # Compile code (in temporary folder to avoid permission problems)
+  if (is.null(dllname))
+    dllname= basename(tempfile())
+  dllfile= paste0(tmpdir,"/",dllname,.Platform$dynlib.ext)
   if (file.exists(dllfile))
     invisible(file.remove(dllfile))
+  wd= getwd()
+  setwd(tmpdir)
   command= paste0("R CMD SHLIB ",shQuote(source_f_fun)," ",shQuote(source_f_gen),
     " ",shQuote(source_f_wrp),
     " --preclean --clean -o ",shQuote(dllfile))
   if (system(command) != 0)
     stop(paste0("Error running '",command,"'"))
+  setwd(wd)
   invisible(file.remove(list.files(pattern=".+[.]mod")))
   return(dllfile)
 }
