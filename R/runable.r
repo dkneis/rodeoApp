@@ -14,14 +14,9 @@
 #'
 #' @return If \code{serverMode} is \code{FALSE}, the function returns
 #'   \code{NULL}. Otherwise it returns a vector holding the names of 3
-#'   files needed to run the GUI. These files carry the extension .r, .rda, and
-#'   .so or .dll, respectively. They reside in the current working directory.
+#'   files needed to run the GUI.
 #'
 #' @author David Kneis \email{david.kneis@@tu-dresden.de}
-#'
-#' @note Existing files are not overwritten unless they reside in R's temporary
-#'   folder. Thus, manual file deletion may be necessary when \code{serverMode}
-#'   is \code{TRUE}.
 #'
 #' @export
 #'
@@ -68,20 +63,12 @@ runGUI= function(
   rodeoAppDataFile= paste0(gsub(pattern="\\", replacement="/", x=tempdir(),
     fixed=TRUE), "/rodeoAppData.rda")
   save(rodeoAppData, file=rodeoAppDataFile, ascii=TRUE)
+  rm(rodeoAppData)
 
   # Start shiny app
   if (serverMode) {
-    src= c(rodeoAppDataFile, rodeoAppData[["dllfile"]], rodeoAppData[["funsR"]])
-    tar= basename(src)
-    bad= tar[file.exists(tar)]
-    if (length(bad) > 0)
-      stop("unwilling to overwrite existing file(s) '",
-        paste(bad, collapse="', '"),"'")
-    file.copy(from=src, to=".")
-    rm(rodeoAppData)
-    return(tar)
+    return(c(rodeoAppDataFile, ini$dllfile, ini$funsR))
   } else {
-    rm(rodeoAppData)
     shiny::runApp(system.file("shiny", package="rodeoApp"))
     return(invisible(NULL))
   }

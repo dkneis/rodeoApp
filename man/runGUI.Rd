@@ -54,17 +54,11 @@ simulated state variables. Missing values must be marked as \code{NA}.}
 \value{
 If \code{serverMode} is \code{FALSE}, the function returns
   \code{NULL}. Otherwise it returns a vector holding the names of 3
-  files needed to run the GUI. These files carry the extension .r, .rda, and
-  .so or .dll, respectively. They reside in the current working directory.
+  files needed to run the GUI.
 }
 \description{
 Runs a rodeo-based model in a shiny GUI to allow for variation of parameters
 and/or initial values.
-}
-\note{
-Existing files are not overwritten unless they reside in R's temporary
-  folder. Thus, manual file deletion may be necessary when \code{serverMode}
-  is \code{TRUE}.
 }
 \examples{
 \dontrun{

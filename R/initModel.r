@@ -127,8 +127,6 @@ initModel= function(
 #   File name of the generated shared library
 
 generateLib= function(model, source_f_fun, dllname=NULL) {
-  # Expand file path
-  source_f_fun= normalizePath(source_f_fun, winslash="/")
   # Get name of temporary folder
   tmpdir= gsub(pattern="\\", replacement="/", x=tempdir(), fixed=TRUE)
   # Generate code to compute derivatives
@@ -149,14 +147,13 @@ generateLib= function(model, source_f_fun, dllname=NULL) {
   dllfile= paste0(tmpdir,"/",dllname,.Platform$dynlib.ext)
   if (file.exists(dllfile))
     invisible(file.remove(dllfile))
-  wd= getwd()
-  setwd(tmpdir)
+  file.copy(from=source_f_fun, to=tmpdir)
+  source_f_fun= paste0(tmpdir,"/",basename(source_f_fun))
   command= paste0("R CMD SHLIB ",shQuote(source_f_fun)," ",shQuote(source_f_gen),
     " ",shQuote(source_f_wrp),
     " --preclean --clean -o ",shQuote(dllfile))
   if (system(command) != 0)
     stop(paste0("Error running '",command,"'"))
-  setwd(wd)
   invisible(file.remove(list.files(pattern=".+[.]mod")))
   return(dllfile)
 }
