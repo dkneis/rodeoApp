@@ -149,12 +149,15 @@ generateLib= function(model, source_f_fun, dllname=NULL) {
     invisible(file.remove(dllfile))
   file.copy(from=source_f_fun, to=tmpdir)
   source_f_fun= paste0(tmpdir,"/",basename(source_f_fun))
+  wd= getwd()
+  setwd(tmpdir)
   command= paste0("R CMD SHLIB ",shQuote(source_f_fun)," ",shQuote(source_f_gen),
     " ",shQuote(source_f_wrp),
     " --preclean --clean -o ",shQuote(dllfile))
   if (system(command) != 0)
     stop(paste0("Error running '",command,"'"))
   invisible(file.remove(list.files(pattern=".+[.]mod")))
+  setwd(wd)
   return(dllfile)
 }
 
