@@ -41,7 +41,9 @@ ui_generate= function(vars, pars) {
       .yaxis.label=  get(".yaxis.label",tempenv),
       .png.width=  get(".png.width",tempenv),
       .png.height= get(".png.height",tempenv),
-      .png.res=    get(".png.res",tempenv)
+      .png.res=    get(".png.res",tempenv),
+      .plot.width= get(".plot.width",tempenv),
+      .plot.height= get(".plot.height",tempenv)
     )
     rm(tempenv)
   } else {
@@ -61,7 +63,9 @@ ui_generate= function(vars, pars) {
       .yaxis.label="State variable(s)",
       .png.width=1200,
       .png.height=800,
-      .png.res=150
+      .png.res=150,
+      .plot.width=600,
+      .plot.height=600
     )
   }
 
@@ -181,7 +185,8 @@ ui_generate= function(vars, pars) {
           ),
           column(8,
             fluidRow(
-              column(12, plotOutput(outputId='plotStates', height='600px', width='90%'))
+              #column(12, plotOutput(outputId='plotStates', height='600px', width='90%'))
+              column(12, uiOutput(outputId='ui_plot'))
             ),
             fluidRow(
               column(3, ''),
@@ -249,8 +254,12 @@ ui_generate= function(vars, pars) {
           column(1, div(style='",labStyle,"',textInput('.png.width', label = 'Width (px)', value=",sett$.png.width,"))),
           column(1, div(style='",labStyle,"',textInput('.png.height', label = 'Height (px)', value=",sett$.png.height,"))),
           column(1, div(style='",labStyle,"',textInput('.png.res', label = 'Resol. (dpi)', value=",sett$.png.res,")))
+        ),
+        fluidRow(
+          column(2, p(style='",headStyle,"', 'Plot dimensions')),
+          column(1, div(style='",labStyle,"',textInput('.plot.width', label = 'Width (px)', value=",sett$.plot.width,"))),
+          column(1, div(style='",labStyle,"',textInput('.plot.height', label = 'Height (px)', value=",sett$.plot.height,")))
         )
-
       ) # End tabPanel
 
     ) # End Navbar page

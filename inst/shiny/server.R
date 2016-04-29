@@ -201,9 +201,13 @@ shinyServer(function(input, output) {
     ))
   })
 
+  plotWidth= function() {as.numeric(input$.plot.width)}
+  plotHeight= function() {as.numeric(input$.plot.height)}
+  
 
   # Plot state variables
-  output$plotStates <- renderPlot({
+  # The technique to pass with/heigh is based on http://stackoverflow.com/questions/30422849/how-to-make-height-argument-dynamic-in-renderplot-in-shiny-r-package
+  output$contents <- renderPlot({
     axDefs= updateAxDefs()
     plotStates(sim(), sim_ref, input$.time.unit, input$.time.base,
       model=rodeoAppData$model,
@@ -214,13 +218,16 @@ shinyServer(function(input, output) {
       labelY=input$.yaxis.label, showOld=input$showRef, obs=rodeoAppData$obs
     )
   })
+  output$ui_plot <- renderUI({
+    plotOutput("contents", width=plotWidth(), height=plotHeight())
+  })
 
   # Download handler
   output$saveImage <- downloadHandler(
     # Function returning a file name
     filename = function() {
-		  paste0("rodeoAppImage_",format(Sys.time(),"%Y-%m-%dT%H%M%S"),".png")
-	  },
+      paste0("rodeoAppImage_",format(Sys.time(),"%Y-%m-%dT%H%M%S"),".png")
+    },
     # Function writing data to its argument 'file'
     content = function(file) {
       tmpFun= function() {
