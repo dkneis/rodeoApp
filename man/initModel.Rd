@@ -5,8 +5,9 @@
 \title{Create model object and generate code}
 \usage{
 initModel(dir = "", xlFile = "model.xlsx", funsR = "functions.r",
-  funsF = "functions.f95", tables = c(vars = "vars", pars = "pars", funs =
-  "funs", pros = "pros", stoi = "stoi"), colsep = ",", dllname = NULL)
+  funsF = list.files(path = dir, pattern = ".+[.]f95$"), tables = c(vars =
+  "vars", pars = "pars", funs = "funs", pros = "pros", stoi = "stoi"),
+  colsep = ",", dllname = NULL)
 }
 \arguments{
 \item{dir}{Directory where input files are located. This value is added as a

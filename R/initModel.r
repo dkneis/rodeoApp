@@ -52,17 +52,20 @@
 #' @export
 
 initModel= function(
-  dir="", xlFile="model.xlsx", funsR="functions.r", funsF="functions.f95",
+  dir="", xlFile="model.xlsx", funsR="functions.r",
+  funsF=list.files(path=dir, pattern=".+[.]f95$"),
   tables= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi"),
   colsep=",", dllname=NULL
 ) {
   # Set/check file names
   funsR= paste(dir,funsR,sep="/")
-  if (!file.exists(funsR))
-    stop("file with function definitions in R not found ('",funsR,"')")
+  if (!all(file.exists(funsR)))
+    stop("file(s) with function definitions in R not found ('",
+      paste(funsR, collapse="', "),"')")
   funsF= paste(dir,funsF,sep="/")
-  if (!file.exists(funsF))
-    stop("file with function definitions in Fortran 95 not found ('",funsF,"')")
+  if (!all(file.exists(funsF)))
+    stop("file(s) with function definitions in Fortran 95 not found ('",
+      paste(funsF, collapse="', "),"')")
   # Check table names
   required= c("vars","pars","funs","pros","stoi")
   if ((length(tables) != 5) || !identical(sort(names(tables)),
@@ -147,13 +150,13 @@ generateLib= function(model, source_f_fun, dllname=NULL) {
   dllfile= paste0(tmpdir,"/",dllname,.Platform$dynlib.ext)
   if (file.exists(dllfile))
     invisible(file.remove(dllfile))
-  file.copy(from=source_f_fun, to=tmpdir)
+  file.copy(from=source_f_fun, to=tmpdir, overwrite=TRUE)
   source_f_fun= paste0(tmpdir,"/",basename(source_f_fun))
   wd= getwd()
   setwd(tmpdir)
-  command= paste0("R CMD SHLIB ",shQuote(source_f_fun)," ",shQuote(source_f_gen),
-    " ",shQuote(source_f_wrp),
-    " --preclean --clean -o ",shQuote(dllfile))
+  command= paste("R CMD SHLIB",paste(shQuote(source_f_fun), collapse=" "),
+    shQuote(source_f_gen),shQuote(source_f_wrp),
+    "--preclean --clean -o",shQuote(dllfile))
   if (system(command) != 0)
     stop(paste0("Error running '",command,"'"))
   invisible(file.remove(list.files(pattern=".+[.]mod")))
