@@ -27,7 +27,7 @@
 #' }
 
 runGUI= function(
-  dir="", xlFile="model.xlsx", funsR="functions.r",
+  dir=".", xlFile="model.xlsx", funsR="functions.r",
   funsF=list.files(path=dir, pattern=".+[.]f95$"),
   tables= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi"),
   colsep=",", obs=NULL, dllname=NULL, serverMode=FALSE
@@ -123,7 +123,7 @@ runMCS= function(
   nruns,
   nsig=4,
   overwrite=FALSE,
-  dir="", xlFile="model.xlsx", funsR="functions.r", funsF="functions.f95",
+  dir=".", xlFile="model.xlsx", funsR="functions.r", funsF="functions.f95",
   tables= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi"),
   colsep=",",
   silent=FALSE

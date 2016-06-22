@@ -5,8 +5,8 @@
 #' Creates a model object from user inputs and builds a shared library
 #' from generated Fortran code.
 #'
-#' @param dir Directory where input files are located. This value is added as a
-#'   prefix to any file names (i.e. \code{xlFile}, \code{funsR}, \code{funsF},
+#' @param dir Directory where input files are located. This is assumed to apply
+#'   to any input files (i.e. \code{xlFile}, \code{funsR}, \code{funsF},
 #'   and possibly the values of \code{tables}).
 #' @param xlFile Either the base name of file in MS Excel format holding
 #'   the model definition or \code{NULL}. In the latter case, the model
@@ -52,7 +52,7 @@
 #' @export
 
 initModel= function(
-  dir="", xlFile="model.xlsx", funsR="functions.r",
+  dir=".", xlFile="model.xlsx", funsR="functions.r",
   funsF=list.files(path=dir, pattern=".+[.]f95$"),
   tables= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi"),
   colsep=",", dllname=NULL
