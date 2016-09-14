@@ -22,13 +22,13 @@ library("rodeoApp")
 #obs= data.frame(1:5, T=seq(1, 1e9, length.out=5))
 #runGUI(dir=system.file("examples/DRT", package="rodeoApp"), obs=obs)
 
-#runGUI(dir=system.file("examples/DRT", package="rodeoApp"))
+runGUI(dir=system.file("examples/DRT", package="rodeoApp"))
 
 #runGUI(dir=system.file("examples/DRT", package="rodeoApp"), dllname="myLib", serverMode=TRUE)
 
 #runGUI(dir="/home/dkneis/tudd/dynaTrait/claudia")
 
-runGUI(dir="/home/dkneis/tudd/dev/r_packages/rodeoApp/inst/examples/chemostat")
+#runGUI(dir="/home/dkneis/tudd/dev/r_packages/rodeoApp/inst/examples/chemostat")
 
 #library(rodeoApp)
 #runMCS(

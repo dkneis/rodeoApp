@@ -1,4 +1,4 @@
-#' Interfaces for rodeo-based models
+#' Interfaces for Rodeo-Based Models
 #'
 #' This package provides convenient interfaces for rodeo-based models. In
 #' particular, it allows for running a rodeo-based from a (shiny) graphical user
@@ -37,12 +37,6 @@ library("rootSolve")
 if (!("readxl" %in% installed.packages()[,1]))
   install.packages("readxl")
 library("readxl")
-
-# Package for latin hypercube sampling
-#' @import lhs
-if (!("lhs" %in% installed.packages()[,1]))
-  install.packages("lhs")
-library("lhs")
 
 # Package allowing direct install of other packages from github
 #' @import devtools

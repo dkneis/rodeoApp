@@ -1,6 +1,6 @@
 # Load data created by runGUI
-dirs= c(".",gsub(pattern="\\", replacement="/", x=tempdir(), fixed=TRUE))
-loaded= FALSE
+dirs <- c(".",gsub(pattern="\\", replacement="/", x=tempdir(), fixed=TRUE))
+loaded <- FALSE
 for (d in dirs) {
   if (file.exists(paste0(d,"/rodeoAppData.rda"))) {
     load(file=paste0(d,"/rodeoAppData.rda"))
@@ -15,17 +15,17 @@ if (!loaded)
 ################################################################################
 # Method to generate GUI code
 
-ui_generate= function(vars, pars) {
+ui_generate <- function(vars, pars) {
 
-  labStyle= "font-family: Arial Narrow; line-height: 10px; color: #3E566A"
-  headStyle= "font-weight: bold; color: #3E566A"
-  newline="\n"
+  labStyle <- "font-family: Arial Narrow; line-height: 10px; color: #3E566A"
+  headStyle <- "font-weight: bold; color: #3E566A"
+  newline <- "\n"
 
   # Settings
   if (file.exists(rodeoAppData$fileSettings)) {
-    tempenv= new.env()
+    tempenv <- new.env()
     sys.source(file=rodeoAppData$fileSettings, envir=tempenv)
-    sett= list(
+    sett <- list(
       .time.start= get(".time.start",tempenv),
       .time.end=   get(".time.end",tempenv),
       .time.dt=    get(".time.dt",tempenv),
@@ -47,7 +47,7 @@ ui_generate= function(vars, pars) {
     )
     rm(tempenv)
   } else {
-    sett= list(
+    sett <- list(
       .time.start=0,
       .time.end=10,
       .time.dt=1,
@@ -70,65 +70,65 @@ ui_generate= function(vars, pars) {
   }
 
   # Dynamic code: Text boxes for parameters
-  inputPars= function() {
-    code=""
-    rows= which(as.logical(pars$user))
+  inputPars <- function() {
+    code <- ""
+    rows <- which(as.logical(pars$user))
     if (length(rows) > 0) {
       for (i in 1:length(rows)) {
         # Begin param name
-        code=paste0(code,"        fluidRow(",newline)
-        code=paste0(code,"          column(12,",newline)
-        code=paste0(code,"            div(style='",labStyle,"', '",pars$label[rows[i]],"')",newline)
-        code=paste0(code,"          )",newline)
-        code=paste0(code,"        ),",newline)
+        code <- paste0(code,"        fluidRow(",newline)
+        code <- paste0(code,"          column(12,",newline)
+        code <- paste0(code,"            div(style='",labStyle,"', '",pars$label[rows[i]],"')",newline)
+        code <- paste0(code,"          )",newline)
+        code <- paste0(code,"        ),",newline)
         # End param name
-        code=paste0(code,"        fluidRow(",newline)
-        code=paste0(code,"          column(12,",newline)
-        code=paste0(code,"            div(style='",labStyle,
+        code <- paste0(code,"        fluidRow(",newline)
+        code <- paste0(code,"          column(12,",newline)
+        code <- paste0(code,"            div(style='",labStyle,
           "',textInput('",pars$name[rows[i]],
           "', label = '', value=",pars$default[rows[i]],"))",newline)
-        code=paste0(code,"          )",newline)
-        code=paste0(code,"        )",ifelse(i==length(rows),"",","),newline)
+        code <- paste0(code,"          )",newline)
+        code <- paste0(code,"        )",ifelse(i==length(rows),"",","),newline)
       }
     } else {
-      code=paste0(code,"p('No visible items')",newline)
+      code <- paste0(code,"p('No visible items')",newline)
     }
     return(code)
   }
 
   # Dynamic code: Text boxes for variables
-  inputVars= function() {
-    code=""
+  inputVars <- function() {
+    code <- ""
     for (i in 1:nrow(vars)) {
       # Begin variable name
-      code=paste0(code,"        fluidRow(",newline)
-      code=paste0(code,"          column(12,",newline)
-      code=paste0(code,"            div(style='",labStyle,
+      code <- paste0(code,"        fluidRow(",newline)
+      code <- paste0(code,"          column(12,",newline)
+      code <- paste0(code,"            div(style='",labStyle,
         "', '",paste0(vars$label[i],ifelse(as.logical(vars$steady[i]),' (SS)','')),"')",newline)
-      code=paste0(code,"          )",newline)
-      code=paste0(code,"        ),",newline)
+      code <- paste0(code,"          )",newline)
+      code <- paste0(code,"        ),",newline)
       # End variable name
-      code=paste0(code,"        fluidRow(",newline)
-      code=paste0(code,"          column(5,",newline)
-      code=paste0(code,"            div(style='",labStyle,
+      code <- paste0(code,"        fluidRow(",newline)
+      code <- paste0(code,"          column(5,",newline)
+      code <- paste0(code,"            div(style='",labStyle,
         "',textInput('",vars$name[i],
         "', label = '', value=",vars$default[i],"))",newline)
-      code=paste0(code,"          ),",newline)
-      code=paste0(code,"          column(4,",newline)
-      code=paste0(code,"            div(style='",labStyle,"',textInput('",vars$name[i],
+      code <- paste0(code,"          ),",newline)
+      code <- paste0(code,"          column(4,",newline)
+      code <- paste0(code,"            div(style='",labStyle,"',textInput('",vars$name[i],
         ".mult', label = ' ', value=",vars$mult[i],"))",newline)
-      code=paste0(code,"          ),",newline)
-      code=paste0(code,"          column(3,",newline)
-      code=paste0(code,"            div(style='",labStyle,"',checkboxInput('",vars$name[i],
+      code <- paste0(code,"          ),",newline)
+      code <- paste0(code,"          column(3,",newline)
+      code <- paste0(code,"            div(style='",labStyle,"',checkboxInput('",vars$name[i],
         ".show', label = ' ', value=",as.logical(vars$show[i]),"))",newline)
-      code=paste0(code,"          )",newline)
-      code=paste0(code,"        )",ifelse(i==nrow(vars),"",","),newline)
+      code <- paste0(code,"          )",newline)
+      code <- paste0(code,"        )",ifelse(i==nrow(vars),"",","),newline)
     }
     return(code)
   }
 
   # --- BEGIN OF UI CODE ---
-  code= paste0(
+  code <- paste0(
   "
   # THIS IS A GENERATED FILE -- DO NOT EDIT
   shinyUI(
@@ -272,8 +272,8 @@ ui_generate= function(vars, pars) {
 
 
 
-#code= ui_generate(vars=rodeoAppData$vars,  pars=rodeoAppData$pars)
-#f= tempfile()
+#code <- ui_generate(vars=rodeoAppData$vars,  pars=rodeoAppData$pars)
+#f <-  tempfile()
 #write(x=code, file=gsub(pattern="\\",replacement="/",x=f,fixed=TRUE))
 #cat("written to",f,"\n")
 

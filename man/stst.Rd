@@ -4,7 +4,7 @@
 \alias{stst}
 \title{Compute steady-state solution}
 \usage{
-stst(model, vars, pars, time, dllfile, rtol, atol)
+stst(model, vars, pars, time, dllfile)
 }
 \arguments{
 \item{model}{Object of class \code{rodeo} representing the model.}
@@ -19,12 +19,6 @@ given point in time. If no external forcings are present (autonomous
 models), the value is ignored.}
 
 \item{dllfile}{Shared library file holding the compiled model.}
-
-\item{rtol}{Vector of the same length as \code{vars} specifying the
-relative tolerance for the solver (see help of \code{deSolve::lsoda}).}
-
-\item{atol}{Vector of the same length as \code{vars} specifying the
-absolute tolerance for the solver (see help of \code{deSolve::lsoda}).}
 }
 \value{
 The object returned by \code{rootSolve::steady}. The \code{y}-

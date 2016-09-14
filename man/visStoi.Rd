@@ -4,10 +4,12 @@
 \alias{visStoi}
 \title{Visualize the stoichiometry matrix}
 \usage{
-visStoi(model, vars, pars, funsR)
+visStoi(model, time, vars, pars, funsR)
 }
 \arguments{
 \item{model}{Object of class \code{rodeo} representing the model.}
+
+\item{time}{Time at which stoichiometry is to be evaluated.}
 
 \item{vars}{Named vector of the state variables' initial values.}
 

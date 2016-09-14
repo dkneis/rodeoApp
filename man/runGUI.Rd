@@ -4,14 +4,15 @@
 \alias{runGUI}
 \title{Run rodeo-based model in shiny GUI}
 \usage{
-runGUI(dir = "", xlFile = "model.xlsx", funsR = "functions.r",
+runGUI(dir = ".", xlFile = "model.xlsx", funsR = "functions.r",
   funsF = list.files(path = dir, pattern = ".+[.]f95$"), tables = c(vars =
   "vars", pars = "pars", funs = "funs", pros = "pros", stoi = "stoi"),
-  colsep = ",", obs = NULL, dllname = NULL, serverMode = FALSE)
+  colsep = ",", stoiAsMatrix = FALSE, obs = NULL, dllname = NULL,
+  serverMode = FALSE)
 }
 \arguments{
-\item{dir}{Directory where input files are located. This value is added as a
-prefix to any file names (i.e. \code{xlFile}, \code{funsR}, \code{funsF},
+\item{dir}{Directory where input files are located. This is assumed to apply
+to any input files (i.e. \code{xlFile}, \code{funsR}, \code{funsF},
 and possibly the values of \code{tables}).}
 
 \item{xlFile}{Either the base name of file in MS Excel format holding
@@ -34,6 +35,9 @@ information.}
 
 \item{colsep}{Specifies the column separator in text files. Only used if
 \code{xlFile} is \code{NULL}.}
+
+\item{stoiAsMatrix}{Logical. Allows the stoichiometry matrix to be supplied
+as a 3-column table or as a matrix.}
 
 \item{obs}{If not \code{NULL}, this must be a data frame with observed values
 of the state variables. Time information (numeric) is expected in the first

@@ -1,8 +1,8 @@
 Package: rodeoApp
 Type: Package
-Title: Simple interface to rodeo-based models
-Version: 0.1
-Date: 2015-05-18
+Title: Interfaces for Rodeo-Based Models
+Version: 0.2
+Date: 2016-09-14
 Author: David Kneis <david.kneis@tu-dresden.de>
 Maintainer: David Kneis <david.kneis@tu-dresden.de>
 Description: Provides simple interfaces to rodeo-based models.
@@ -14,9 +14,5 @@ Imports:
     deSolve,
     rootSolve,
     shiny,
-    lhs,
     readxl
-Suggests:
-    knitr
-VignetteBuilder: knitr
 RoxygenNote: 5.0.1

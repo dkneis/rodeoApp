@@ -4,7 +4,7 @@
 \name{rodeoApp-package}
 \alias{rodeoApp}
 \alias{rodeoApp-package}
-\title{Interfaces for rodeo-based models}
+\title{Interfaces for Rodeo-Based Models}
 \description{
 This package provides convenient interfaces for rodeo-based models. In
 particular, it allows for running a rodeo-based from a (shiny) graphical user

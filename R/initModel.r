@@ -24,6 +24,8 @@
 #'   information.
 #' @param colsep Specifies the column separator in text files. Only used if
 #'   \code{xlFile} is \code{NULL}.
+#' @param stoiAsMatrix Logical. Allows the stoichiometry matrix to be supplied
+#'   as a 3-column table or as a matrix.
 #' @param dllname Character string used as the name for the built library. This
 #'   is the base name without file extension (must not contain path separators,
 #'   white space, etc.). If set to \code{NULL} (the default), an automatic
@@ -51,70 +53,74 @@
 #'
 #' @export
 
-initModel= function(
+initModel <- function(
   dir=".", xlFile="model.xlsx", funsR="functions.r",
   funsF=list.files(path=dir, pattern=".+[.]f95$"),
   tables= c(vars="vars",pars="pars",funs="funs",pros="pros",stoi="stoi"),
-  colsep=",", dllname=NULL
+  colsep=",", stoiAsMatrix=FALSE, dllname=NULL
 ) {
   # Set/check file names
-  funsR= paste(dir,funsR,sep="/")
+  funsR <- paste(dir,funsR,sep="/")
   if (!all(file.exists(funsR)))
     stop("file(s) with function definitions in R not found ('",
       paste(funsR, collapse="', "),"')")
-  funsF= paste(dir,funsF,sep="/")
+  funsF <- paste(dir,funsF,sep="/")
   if (!all(file.exists(funsF)))
-    stop("file(s) with function definitions in Fortran 95 not found ('",
+    stop("file(s) with function definitions in Fortran not found ('",
       paste(funsF, collapse="', "),"')")
   # Check table names
-  required= c("vars","pars","funs","pros","stoi")
+  required <- c("vars","pars","funs","pros","stoi")
   if ((length(tables) != 5) || !identical(sort(names(tables)),
     sort(required)) || !is.character(tables))
     stop("argument 'tables' must be a character vector with elements '",
       paste(required,collapse="', '"),"'")
   # Init list to hold the model definition tables
-  tbl= list()
+  tbl <- list()
   # Read tables from Excel worksheets
   if (!is.null(xlFile)) {
-    xlFile= paste(dir,xlFile,sep="/")
+    xlFile <- paste(dir,xlFile,sep="/")
     if (!file.exists(xlFile))
       stop(paste0("file with model definition not found ('",xlFile,"')"))
     for (i in 1:length(tables)) {
       tryCatch({
-        tmp= read_excel(path=xlFile, sheet=tables[i], col_names= TRUE,
+        tmp <- read_excel(path=xlFile, sheet=tables[i], col_names= TRUE,
           col_types=NULL, na="", skip=0)
          # drop empty rows
-        tmp= subset(tmp, apply(tmp, 1, function(x) {!all(is.na(x))}))
+        tmp <- subset(tmp, apply(tmp, 1, function(x) {!all(is.na(x))}))
       }, error= function(e) {
         stop(paste0("failed to import data from worksheet '",tables[i],
           "' of workbook (i.e. file) '",xlFile,"'; details: ",e))
       })
-      tbl[[i]]= tmp
-      names(tbl)[i]= tables[i]
+      tbl[[i]] <- tmp
+      names(tbl)[i] <- tables[i]
     }
 
   # Read tables from tabular text files
   } else {
     for (i in 1:length(tables)) {
-      f= paste(dir,tables[i],sep="/")
+      f <- paste(dir,tables[i],sep="/")
       if (!file.exists(f))
         stop("file with model definition, part '",names(tables)[i],"', not found ('",f,"')")
       tryCatch({
-        tmp= read.table(file=f,sep=colsep,header=TRUE)
+        tmp <- utils::read.table(file=f,sep=colsep,header=TRUE)
       }, error= function(e) {
         stop(paste0("failed to import data from text file '",f,
           "'; details: ",e))
       })
-      tbl[[i]]= tmp
-      names(tbl)[i]= tables[i]
+      tbl[[i]] <- tmp
+      names(tbl)[i] <- tables[i]
     }
   }
   ##print(tbl)
   # Create rodeo object
-  model= new("rodeo", vars=tbl$vars, pars=tbl$pars, funs=tbl$funs,
-    pros=tbl$pros, stoi=tbl$stoi)
+  if (stoiAsMatrix)
+    tbl[["stoi"]] <- as.matrix(tbl[["stoi"]])
+  model <- rodeo$new(vars=tbl$vars, pars=tbl$pars, funs=tbl$funs,
+    pros=tbl$pros, stoi=tbl$stoi,
+    asMatrix=stoiAsMatrix,
+    size=1)                   # GUI handles 0D models only
   # Generate shared lib
-  dllfile= generateLib(model=model, source_f_fun=funsF, dllname=dllname)
+  dllfile <- generateLib(model=model, source_f_fun=funsF, dllname=dllname)
   # Return
   return(list(model=model, dllfile=dllfile, funsR=funsR,
     vars=tbl$vars, pars=tbl$pars))
@@ -129,32 +135,32 @@ initModel= function(
 # Returns
 #   File name of the generated shared library
 
-generateLib= function(model, source_f_fun, dllname=NULL) {
+generateLib <- function(model, source_f_fun, dllname=NULL) {
   # Get name of temporary folder
-  tmpdir= gsub(pattern="\\", replacement="/", x=tempdir(), fixed=TRUE)
+  tmpdir <- gsub(pattern="\\", replacement="/", x=tempdir(), fixed=TRUE)
   # Generate code to compute derivatives
-  code= model$generate(name="derivs",lang="f95")
-  source_f_gen= gsub(pattern="\\", replacement="/",
+  code <- model$generate(name="derivs",lang="f95")
+  source_f_gen <- gsub(pattern="\\", replacement="/",
     x=paste0(tempfile(), ".f95"), fixed=TRUE)
   write(x=code, file=source_f_gen)
 #  cat("code written to",source_f_gen)
   # Create wrapper code for compatibility with deSolve; single spatial level
-  code= solverInterface(1, "derivs")
-  source_f_wrp= gsub(pattern="\\", replacement="/",
+  code <- solverInterface(1, "derivs")
+  source_f_wrp <- gsub(pattern="\\", replacement="/",
     x=paste0(tempfile(), ".f95"), fixed=TRUE)
   write(x=code, file=source_f_wrp)
 #  cat("code written to",source_f_wrp)
   # Compile code (in temporary folder to avoid permission problems)
   if (is.null(dllname))
     dllname= basename(tempfile())
-  dllfile= paste0(tmpdir,"/",dllname,.Platform$dynlib.ext)
+  dllfile <- paste0(tmpdir,"/",dllname,.Platform$dynlib.ext)
   if (file.exists(dllfile))
     invisible(file.remove(dllfile))
   file.copy(from=source_f_fun, to=tmpdir, overwrite=TRUE)
   source_f_fun= paste0(tmpdir,"/",basename(source_f_fun))
-  wd= getwd()
+  wd <- getwd()
   setwd(tmpdir)
-  command= paste("R CMD SHLIB",paste(shQuote(source_f_fun), collapse=" "),
+  command <- paste("R CMD SHLIB",paste(shQuote(source_f_fun), collapse=" "),
     shQuote(source_f_gen),shQuote(source_f_wrp),
     "--preclean --clean -o",shQuote(dllfile))
   if (system(command) != 0)

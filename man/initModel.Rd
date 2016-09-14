@@ -4,14 +4,14 @@
 \alias{initModel}
 \title{Create model object and generate code}
 \usage{
-initModel(dir = "", xlFile = "model.xlsx", funsR = "functions.r",
+initModel(dir = ".", xlFile = "model.xlsx", funsR = "functions.r",
   funsF = list.files(path = dir, pattern = ".+[.]f95$"), tables = c(vars =
   "vars", pars = "pars", funs = "funs", pros = "pros", stoi = "stoi"),
-  colsep = ",", dllname = NULL)
+  colsep = ",", stoiAsMatrix = FALSE, dllname = NULL)
 }
 \arguments{
-\item{dir}{Directory where input files are located. This value is added as a
-prefix to any file names (i.e. \code{xlFile}, \code{funsR}, \code{funsF},
+\item{dir}{Directory where input files are located. This is assumed to apply
+to any input files (i.e. \code{xlFile}, \code{funsR}, \code{funsF},
 and possibly the values of \code{tables}).}
 
 \item{xlFile}{Either the base name of file in MS Excel format holding
@@ -34,6 +34,9 @@ information.}
 
 \item{colsep}{Specifies the column separator in text files. Only used if
 \code{xlFile} is \code{NULL}.}
+
+\item{stoiAsMatrix}{Logical. Allows the stoichiometry matrix to be supplied
+as a 3-column table or as a matrix.}
 
 \item{dllname}{Character string used as the name for the built library. This
 is the base name without file extension (must not contain path separators,
