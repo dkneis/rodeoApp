@@ -21,8 +21,8 @@ visStoi <- function(model, time, vars, pars, funsR) {
     if (as.numeric(x) < 0) return("<span style='color: #5684C1;'>&nabla;</span>") #return("&#9661;")
     return("") #return("&empty;")
   }
-  model$assignVars(vars)
-  model$assignPars(pars)
+  model$setVars(vars)
+  model$setPars(pars)
   m <- model$stoichiometry(section=1, time=time)
   tbl <- cbind(data.frame(process=rownames(m), stringsAsFactors=FALSE), as.data.frame(m))
   html <- exportDF(x=tbl, tex=FALSE,
