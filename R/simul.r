@@ -17,8 +17,8 @@
 #' @export
 simul <- function(model, vars, pars, times, dllfile) {
   # Assign data
-  model$assignVars(vars)
-  model$assignPars(pars)
+  model$setVars(vars)
+  model$setPars(pars)
   # Set tolerances
   rtol <- model$getVarsTable()$rtol
   atol <- model$getVarsTable()$atol
@@ -32,10 +32,10 @@ simul <- function(model, vars, pars, times, dllfile) {
     x=basename(dllfile))
   dyn.load(dllfile)
   # Integrate
-  out <- deSolve::ode(y=model$queryVars(), times=times, func="derivs_wrapped",
+  out <- deSolve::ode(y=model$getVars(), times=times, func="derivs_wrapped",
     rtol=rtol, atol=atol, dllname=dllname,
     initfunc="initmod", nout=model$lenPros(), outnames=model$namesPros(),
-    parms=model$queryPars())
+    parms=model$getPars())
   if (attr(out,which="istate",exact=TRUE)[1] != 2)
     stop(paste0("Integration failed.\n----- The initial values were:\n",
       paste(names(vars),vars,sep="=",collapse="\n"),"\n----- The parameters were:\n",
@@ -68,8 +68,8 @@ simul <- function(model, vars, pars, times, dllfile) {
 #' @export
 stst <- function(model, vars, pars, time, dllfile) {
   # Assign data
-  model$assignVars(vars)
-  model$assignPars(pars)
+  model$setVars(vars)
+  model$setPars(pars)
   # Set tolerances
   rtol <- model$getVarsTable()$rtol
   atol <- model$getVarsTable()$atol
@@ -79,8 +79,8 @@ stst <- function(model, vars, pars, time, dllfile) {
     x=basename(dllfile))
   dyn.load(dllfile)
   # Compute steady state solution
-  out <- rootSolve::steady(y=model$queryVars(), time=time, func="derivs_wrapped",
-    parms=model$queryPars(), method="stode", rtol=rtol, atol=atol,
+  out <- rootSolve::steady(y=model$getVars(), time=time, func="derivs_wrapped",
+    parms=model$getPars(), method="stode", rtol=rtol, atol=atol,
     dllname=dllname, initfunc="initmod",
     nout=model$lenPros(), outnames=model$namesPros())
   if (!attr(out, which="steady",exact=TRUE))

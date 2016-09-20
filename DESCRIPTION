@@ -2,7 +2,7 @@ Package: rodeoApp
 Type: Package
 Title: Interfaces for Rodeo-Based Models
 Version: 0.2
-Date: 2016-09-14
+Date: 2016-09-16
 Author: David Kneis <david.kneis@tu-dresden.de>
 Maintainer: David Kneis <david.kneis@tu-dresden.de>
 Description: Provides simple interfaces to rodeo-based models.
