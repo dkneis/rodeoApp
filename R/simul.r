@@ -24,6 +24,10 @@ simul <- function(model, vars, pars, times, dllfile) {
   atol <- model$getVarsTable()$atol
   # Load library
   ext <- substr(.Platform$dynlib.ext, 2, nchar(.Platform$dynlib.ext))
+  # thpe: improve compatibility between Unixes and Windows
+  # (use .dll/.so of the target system, irrespective where it comes from)
+  dllfile <- sub("so$|dll$", ext, dllfile)
+  # end thpe
   dllname <- sub(pattern=paste0("(.+)[.]",ext,"$"),replacement="\\1",
     x=basename(dllfile))
   dyn.load(dllfile)
